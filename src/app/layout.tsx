@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import localFont from 'next/font/local'
+import dynamic from 'next/dynamic'
 import './globals.css'
 
 const geist = Geist({
@@ -8,30 +8,14 @@ const geist = Geist({
   subsets: ['latin'],
 })
 
-const geistMono = Geist_Mono({
+const geist_mono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 })
 
-const instrumentSerif = localFont({
-  src: [
-    {
-      path: '../fonts/InstrumentSerif-Regular.ttf',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../fonts/InstrumentSerif-Italic.ttf',
-      weight: '400',
-      style: 'italic',
-    },
-  ],
-  variable: '--font-instrument-serif',
-})
-
 export const metadata: Metadata = {
   title: 'Authority Platform',
-  description: 'Build your personal brand and generate authority pages from your YouTube content',
+  description: 'Convert your YouTube channel into SEO-optimized authority',
 }
 
 export default function RootLayout({
@@ -41,7 +25,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} ${geistMono.variable} ${instrumentSerif.variable}`}>
+      <body
+        className={`${geist.variable} ${geist_mono.variable} font-sans antialiased`}
+      >
         {children}
       </body>
     </html>

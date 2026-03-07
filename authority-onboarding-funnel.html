@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0A0A0A">
+    <title>Authority Mapping — Creator Onboarding</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg:        #0A0A0A;
+            --surface:   #141414;
+            --card:      #1C1C1C;
+            --border:    rgba(255,255,255,0.08);
+            --border-md: rgba(255,255,255,0.15);
+            --white:     #FFFFFF;
+            --txt:       rgba(255,255,255,0.90);
+            --txt-mid:   rgba(255,255,255,0.55);
+            --txt-faint: rgba(255,255,255,0.28);
+            --accent:    #E8FF47;
+            --accent2:   #FF3B5C;
+            --accent3:   #4DFFA4;
+            --gutter:    clamp(20px, 5vw, 40px);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+        body {
+            font-family: 'Geist', sans-serif;
+            background: var(--bg);
+            color: var(--txt);
+            min-height: 100svh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* grain */
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: 999; pointer-events: none;
+            opacity: .025; background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+        }
+
+        /* ── TYPOGRAPHY ── */
+        .serif { font-family: 'Instrument Serif', serif; }
+        .mono  { font-family: 'Geist Mono', monospace; }
+
+        /* ── LAYOUT ── */
+        #app {
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── PROGRESS BAR ── */
+        .progress-bar-wrap {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: 3px; background: rgba(255,255,255,0.07);
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #FFEE00);
+            transition: width .5s cubic-bezier(.22,1,.36,1);
+            box-shadow: 0 0 12px rgba(232,255,71,.5);
+        }
+
+        /* ── HEADER ── */
+        .form-header {
+            padding: clamp(20px,4vw,28px) var(--gutter);
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 3px; z-index: 90;
+            background: rgba(10,10,10,.95);
+            backdrop-filter: blur(12px);
+        }
+        .header-logo {
+            font-family: 'Instrument Serif', serif;
+            font-size: 18px; color: var(--white); text-decoration: none; letter-spacing: -.01em;
+        }
+        .header-logo em { color: var(--accent); font-style: italic; }
+        .step-indicator {
+            font-family: 'Geist Mono', monospace;
+            font-size: 11px; color: var(--txt-faint); letter-spacing: .14em;
+        }
+        .step-indicator span { color: var(--accent); }
+
+        /* ── MAIN STAGE ── */
+        .stage {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(40px,8vw,80px) var(--gutter);
+            max-width: 720px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ── STEP PANEL ── */
+        .step-panel {
+            display: none;
+            width: 100%;
+            animation: step-in .45s cubic-bezier(.22,1,.36,1) both;
+        }
+        .step-panel.active { display: block; }
+        .step-panel.exit { animation: step-out .3s cubic-bezier(.22,1,.36,1) both; }
+
+        @keyframes step-in  { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
+        @keyframes step-out { from { opacity:1; transform:none; } to { opacity:0; transform:translateY(-12px); } }
+
+        /* ── EYEBROW / STEP LABEL ── */
+        .step-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+            color: var(--txt-faint); margin-bottom: 18px;
+        }
+        .step-eyebrow .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        /* ── QUESTION TITLE ── */
+        .q-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(26px, 5vw, 42px);
+            font-weight: 400;
+            line-height: 1.15;
+            letter-spacing: -.02em;
+            color: var(--white);
+            margin-bottom: 10px;
+        }
+        .q-title em { color: var(--accent); font-style: italic; }
+
+        .q-sub {
+            font-size: 14px; color: var(--txt-mid); line-height: 1.65;
+            margin-bottom: 32px; max-width: 520px; font-weight: 300;
+        }
+
+        /* ── CHIP / PILL OPTIONS ── */
+        .chip-grid {
+            display: flex; flex-wrap: wrap; gap: 10px;
+            margin-bottom: 32px;
+        }
+        .chip {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 11px 18px; border-radius: 100px;
+            border: 1.5px solid var(--border-md);
+            background: var(--surface);
+            font-size: 13px; font-weight: 500; color: var(--txt-mid);
+            cursor: pointer;
+            transition: border-color .2s, background .2s, color .2s, transform .15s, box-shadow .2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .chip:hover { border-color: rgba(232,255,71,.4); color: var(--white); background: rgba(232,255,71,.06); }
+        .chip.selected {
+            border-color: var(--accent);
+            background: rgba(232,255,71,.12);
+            color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(232,255,71,.3);
+        }
+        .chip.selected:hover { transform: scale(1.02); }
+        .chip.danger { border-color: rgba(255,59,92,.2); }
+        .chip.danger:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(255,59,92,.07); }
+        .chip.danger.selected { border-color: var(--accent2); background: rgba(255,59,92,.12); color: var(--accent2); box-shadow: 0 0 0 1px rgba(255,59,92,.3); }
+
+        /* ── CARD OPTIONS (big selectable cards) ── */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+            gap: 12px; margin-bottom: 32px;
+        }
+        .opt-card {
+            padding: 20px 18px; border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            transition: border-color .2s, background .2s, transform .2s, box-shadow .2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .opt-card:hover { border-color: var(--border-md); transform: translateY(-2px); }
+        .opt-card.selected {
+            border-color: var(--accent);
+            background: rgba(232,255,71,.07);
+            box-shadow: 0 0 0 1px rgba(232,255,71,.25), 0 8px 32px rgba(232,255,71,.06);
+        }
+        .opt-card .card-icon { font-size: 24px; margin-bottom: 12px; display: block; }
+        .opt-card .card-label { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+        .opt-card .card-desc { font-size: 12px; color: var(--txt-mid); line-height: 1.5; }
+        .opt-card .card-check {
+            width: 18px; height: 18px; border-radius: 50%;
+            border: 1.5px solid var(--border-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; margin-bottom: 12px;
+            transition: background .2s, border-color .2s;
+            color: transparent;
+        }
+        .opt-card.selected .card-check { background: var(--accent); border-color: var(--accent); color: #000; }
+
+        /* ── SCALE / RANGE OPTION ── */
+        .scale-grid { display: flex; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
+        .scale-opt {
+            flex: 1; min-width: 52px; max-width: 80px;
+            padding: 14px 8px; border-radius: 6px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            text-align: center; cursor: pointer;
+            transition: border-color .2s, background .2s;
+            user-select: none;
+        }
+        .scale-opt:hover { border-color: var(--border-md); }
+        .scale-opt.selected { border-color: var(--accent); background: rgba(232,255,71,.07); }
+        .scale-opt .scale-num { font-family: 'Instrument Serif', serif; font-size: 22px; color: var(--white); display: block; }
+        .scale-opt .scale-label { font-size: 10px; color: var(--txt-faint); margin-top: 3px; letter-spacing: .06em; text-transform: uppercase; }
+
+        /* ── TEXT INPUT ── */
+        .text-input {
+            width: 100%; padding: 16px 20px;
+            background: var(--surface); border: 1.5px solid var(--border-md);
+            border-radius: 8px; color: var(--white);
+            font-family: 'Geist', sans-serif; font-size: 15px;
+            outline: none; margin-bottom: 32px;
+            transition: border-color .2s, box-shadow .2s;
+            -webkit-appearance: none;
+        }
+        .text-input::placeholder { color: var(--txt-faint); }
+        .text-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,255,71,.1); }
+
+        textarea.text-input { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+        .input-hint { font-size: 12px; color: var(--txt-faint); margin-top: -24px; margin-bottom: 32px; }
+
+        /* ── URL ROW ── */
+        .url-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+        .url-row {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--surface); border: 1.5px solid var(--border-md);
+            border-radius: 8px; padding: 4px 4px 4px 14px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .url-row:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,255,71,.08); }
+        .url-prefix { font-size: 12px; color: var(--txt-faint); white-space: nowrap; font-family: 'Geist Mono', monospace; }
+        .url-input {
+            flex: 1; background: transparent; border: none; outline: none;
+            color: var(--white); font-family: 'Geist', sans-serif; font-size: 14px;
+            padding: 10px 0;
+        }
+        .url-input::placeholder { color: var(--txt-faint); }
+        .url-platform-badge {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 6px;
+            background: var(--card); font-size: 12px; font-weight: 500;
+            color: var(--txt-mid); white-space: nowrap;
+        }
+
+        /* ── ANTI-VISION CARD ── */
+        .anti-card {
+            border: 1.5px solid rgba(255,59,92,.2);
+            background: rgba(255,59,92,.04);
+            border-radius: 8px; padding: 16px 20px;
+            margin-bottom: 10px; cursor: pointer;
+            display: flex; align-items: flex-start; gap: 14px;
+            transition: border-color .2s, background .2s;
+            user-select: none;
+        }
+        .anti-card:hover { border-color: rgba(255,59,92,.4); background: rgba(255,59,92,.08); }
+        .anti-card.selected { border-color: var(--accent2); background: rgba(255,59,92,.12); }
+        .anti-card .anti-check {
+            width: 18px; height: 18px; border-radius: 3px;
+            border: 1.5px solid rgba(255,59,92,.3);
+            flex-shrink: 0; margin-top: 1px;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .2s, border-color .2s; font-size: 11px; color: transparent;
+        }
+        .anti-card.selected .anti-check { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+        .anti-card .anti-label { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+        .anti-card .anti-desc { font-size: 12px; color: var(--txt-mid); line-height: 1.5; }
+
+        /* ── NAVIGATION BUTTONS ── */
+        .btn-row {
+            display: flex; gap: 12px; align-items: center;
+            margin-top: 8px;
+        }
+        .btn-next {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--accent); color: #000;
+            font-family: 'Geist', sans-serif; font-weight: 700; font-size: 14px;
+            letter-spacing: .04em; text-transform: uppercase;
+            padding: 15px 32px; border-radius: 3px; border: none;
+            cursor: pointer; text-decoration: none;
+            transition: background .2s, transform .15s, box-shadow .2s;
+            min-height: 50px;
+        }
+        .btn-next:hover { background: #f0ff30; box-shadow: 0 8px 32px rgba(232,255,71,.35); transform: translateY(-1px); }
+        .btn-next:active { transform: scale(.98); }
+        .btn-next:disabled { background: rgba(232,255,71,.3); color: rgba(0,0,0,.4); cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-back {
+            background: transparent; border: 1.5px solid var(--border-md);
+            color: var(--txt-mid); font-family: 'Geist', sans-serif; font-size: 13px;
+            padding: 14px 22px; border-radius: 3px; cursor: pointer;
+            transition: border-color .2s, color .2s;
+            min-height: 50px;
+        }
+        .btn-back:hover { border-color: var(--border-md); color: var(--white); }
+        .btn-skip {
+            background: transparent; border: none;
+            color: var(--txt-faint); font-size: 12px; cursor: pointer;
+            text-decoration: underline; padding: 8px;
+        }
+        .btn-skip:hover { color: var(--txt-mid); }
+
+        /* ── REQUIRED HINT ── */
+        .required-hint { font-size: 11px; color: var(--txt-faint); margin-top: 12px; }
+
+        /* ── SCORE SIDEBAR / ENTITY MAP PREVIEW ── */
+        .entity-preview {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px; padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+        .entity-preview-title { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--txt-faint); margin-bottom: 12px; }
+        .entity-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .entity-row:last-child { border-bottom: none; }
+        .entity-key { color: var(--txt-mid); }
+        .entity-val { color: var(--accent); font-weight: 600; font-family: 'Geist Mono', monospace; font-size: 12px; }
+        .entity-val.empty { color: var(--txt-faint); font-weight: 400; }
+
+        /* ── COMPLETION / RESULT ── */
+        .result-panel { text-align: center; }
+        .result-score-ring {
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 3px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+        .result-score-ring svg { position: absolute; inset: -3px; transform: rotate(-90deg); }
+        .result-score-num {
+            font-family: 'Instrument Serif', serif;
+            font-size: 36px; font-weight: 400; color: var(--white); position: relative; z-index: 1;
+        }
+        .result-score-label { font-size: 11px; color: var(--txt-faint); letter-spacing: .1em; text-transform: uppercase; }
+
+        .result-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0 32px; }
+        .result-tag {
+            padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 600;
+            letter-spacing: .06em; text-transform: uppercase;
+        }
+        .result-tag.green  { background: rgba(77,255,164,.1); color: var(--accent3); border: 1px solid rgba(77,255,164,.2); }
+        .result-tag.yellow { background: rgba(232,255,71,.1); color: var(--accent); border: 1px solid rgba(232,255,71,.2); }
+        .result-tag.red    { background: rgba(255,59,92,.1); color: var(--accent2); border: 1px solid rgba(255,59,92,.2); }
+
+        .result-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin-bottom: 24px; text-align: left; }
+        .result-summary h4 { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+        .result-summary p  { font-size: 13px; color: var(--txt-mid); line-height: 1.65; }
+
+        .btn-calendly {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            background: var(--accent); color: #000;
+            font-family: 'Geist', sans-serif; font-weight: 700; font-size: 15px;
+            letter-spacing: .03em; padding: 18px 40px; border-radius: 3px;
+            text-decoration: none; width: 100%; margin-bottom: 14px;
+            transition: background .2s, box-shadow .2s, transform .15s;
+            min-height: 56px;
+        }
+        .btn-calendly:hover { background: #f0ff30; box-shadow: 0 10px 40px rgba(232,255,71,.35); transform: translateY(-1px); }
+        .btn-calendly:active { transform: scale(.98); }
+
+        /* ── MULTI-SELECT LABEL ── */
+        .select-hint { font-size: 12px; color: var(--txt-faint); margin-bottom: 16px; }
+
+        /* ── SECTION DIVIDER in steps ── */
+        .step-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .card-grid { grid-template-columns: 1fr 1fr; }
+            .scale-grid { gap: 6px; }
+            .scale-opt { min-width: 40px; padding: 12px 6px; }
+            .btn-row { flex-direction: column; align-items: stretch; }
+            .btn-next, .btn-back { width: 100%; justify-content: center; }
+        }
+        @media (max-width: 360px) {
+            .card-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- Progress bar -->
+    <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="form-header">
+        <a href="#" class="header-logo">Authority<em>.</em></a>
+        <div class="step-indicator">STEP <span id="step-cur">1</span> OF <span id="step-total">9</span></div>
+    </header>
+
+    <!-- Stage -->
+    <main class="stage" id="stage">
+
+        <!-- ══ STEP 0: INTRO ══ -->
+        <div class="step-panel active" id="step-0">
+            <div class="step-eyebrow"><span class="dot"></span>Authority Mapping</div>
+            <h1 class="q-title">Let's map your <em>entire</em> online presence.</h1>
+            <p class="q-sub">This takes ~4 minutes. No walls of text — mostly taps. At the end, you'll get a personalised authority score and a direct line to book a call.</p>
+
+            <div class="entity-preview">
+                <div class="entity-preview-title">// Entity Map — initialising</div>
+                <div class="entity-row"><span class="entity-key">Name / Handle</span><span class="entity-val empty">—</span></div>
+                <div class="entity-row"><span class="entity-key">Primary Platform</span><span class="entity-val empty">—</span></div>
+                <div class="entity-row"><span class="entity-key">Niche Entity</span><span class="entity-val empty">—</span></div>
+                <div class="entity-row"><span class="entity-key">Business Model</span><span class="entity-val empty">—</span></div>
+                <div class="entity-row"><span class="entity-key">Google Presence</span><span class="entity-val empty">—</span></div>
+                <div class="entity-row"><span class="entity-key">LLM Visibility</span><span class="entity-val empty">—</span></div>
+                <div class="entity-row"><span class="entity-key">Authority Score</span><span class="entity-val empty">—/100</span></div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-next" onclick="goNext()">Start Mapping →</button>
+            </div>
+        </div>
+
+        <!-- ══ STEP 1: WHO ARE YOU ══ -->
+        <div class="step-panel" id="step-1">
+            <div class="step-eyebrow"><span class="dot"></span>Entity Identity</div>
+            <h2 class="q-title">What's your name and primary handle?</h2>
+            <p class="q-sub">This becomes your entity anchor — the name search engines and AI systems need to associate with your niche.</p>
+
+            <input type="text" class="text-input" id="input-name" placeholder="Your name or brand name" autocomplete="name" autocapitalize="words">
+            <input type="text" class="text-input" id="input-handle" placeholder="@yourhandle" style="margin-top:-20px;" autocomplete="off" autocorrect="off">
+            <p class="input-hint">Use the handle you're most known by across platforms.</p>
+
+            <div class="btn-row">
+                <button class="btn-back" onclick="goBack()">←</button>
+                <button class="btn-next" onclick="validateAndNext(['input-name'], 1)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══ STEP 2: PRIMARY PLATFORM ══ -->
+        <div class="step-panel" id="step-2">
+            <div class="step-eyebrow"><span class="dot"></span>Content Channels</div>
+            <h2 class="q-title">Where do you <em>primarily</em> create?</h2>
+            <p class="q-sub">Pick your main platform — where 70%+ of your content effort goes.</p>
+
+            <div class="card-grid" id="platform-grid">
+                <div class="opt-card" data-val="instagram" onclick="selectCard(this, 'platform-grid', false)">
+                    <div class="card-check">✓</div>
+                    <span class="card-icon">📸</span>
+                    <div class="card-label">Instagram</div>
+                    <div class="card-desc">Reels, carousels, stories</div>
+                </div>
+                <div class="opt-card" data-val="tiktok" onclick="selectCard(this, 'platform-grid', false)">
+                    <div class="card-check">✓</div>
+                    <span class="card-icon">♪</span>
+                    <div class="card-label">TikTok</div>
+                    <div class="card-desc">Short-form video</div>
+                </div>
+                <div class="opt-card" data-val="youtube" onclick="selectCard(this, 'platform-grid', false)">
+                    <div class="card-check">✓</div>
+                    <span class="card-icon">▶</span>
+                    <div class="card-label">YouTube</div>
+                    <div class="card-desc">Long-form & Shorts</div>
+                </div>
+                <div class="opt-card" data-val="linkedin" onclick="selectCard(this, 'platform-grid', false)">
+                    <div class="card-check">✓</div>
+                    <span class="card-icon">💼</span>
+                    <div class="card-label">LinkedIn</div>
+                    <div class="card-desc">Thought leadership</div>
+                </div>
+                <div class="opt-card" data-val="twitter" onclick="selectCard(this, 'platform-grid', false)">
+                    <div class="card-check">✓</div>
+                    <span class="card-icon">𝕏</span>
+                    <div class="card-label">X / Twitter</div>
+                    <div class="card-desc">Text + threads</div>
+                </div>
+                <div class="opt-card" data-val="podcast" onclick="selectCard(this, 'platform-grid', false)">
+                    <div class="card-check">✓</div>
+                    <span class="card-icon">🎙️</span>
+                    <div class="card-label">Podcast</div>
+                    <div class="card-desc">Audio content</div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-back" onclick="goBack()">←</button>
+                <button class="btn-next" onclick="requireSelection('platform-grid', 2)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══ STEP 3: SECONDARY CHANNELS ══ -->
+        <div class="step-panel" id="step-3">
+            <div class="step-eyebrow"><span class="dot"></span>Content Channels</div>
+            <h2 class="q-title">What other channels are <em>active</em>?</h2>
+            <p class="q-sub">Select all platforms where you post at least once a week.</p>
+            <p class="select-hint">Select all that apply →</p>
+
+            <div class="chip-grid" id="secondary-grid">
+                <div class="chip" data-val="instagram" onclick="toggleChip(this)">📸 Instagram</div>
+                <div class="chip" data-val="tiktok" onclick="toggleChip(this)">♪ TikTok</div>
+                <div class="chip" data-val="youtube" onclick="toggleChip(this)">▶ YouTube</div>
+                <div class="chip" data-val="linkedin" onclick="toggleChip(this)">💼 LinkedIn</div>
+                <div class="chip" data-val="twitter" onclick="toggleChip(this)">𝕏 Twitter/X</div>
+                <div class="chip" data-val="newsletter" onclick="toggleChip(this)">✉️ Newsletter</div>
+                <div class="chip" data-val="podcast" onclick="toggleChip(this)">🎙️ Podcast</div>
+                <div class="chip" data-val="blog" onclick="toggleChip(this)">📝 Blog</div>
+                <div class="chip" data-val="none" onclick="toggleChip(this)">🚫 None others</div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-back" onclick="goBack()">←</button>
+                <button class="btn-next" onclick="goNext()">Continue →</button>
+                <button class="btn-skip" onclick="goNext()">Skip</button>
+            </div>
+        </div>
+
+        <!-- ══ STEP 4: NICHE + ENTITY ══ -->
+        <div class="step-panel" id="step-4">
+            <div class="step-eyebrow"><span class="dot"></span>Entity Mapping</div>
+            <h2 class="q-title">What is your <em>niche</em>?</h2>
+            <p class="q-sub">How would you describe what you're the expert in? Be specific — "fitness" is too broad. "Functional training for busy professionals" is an entity.</p>
+
+            <input type="text" class="text-input" id="input-niche" placeholder="e.g. Strength training for women 35+" autocomplete="off">
+
+            <hr class="step-divider">
+            <p class="q-sub" style="margin-bottom:16px;">Which category best fits your niche?</p>
+
+            <div class="chip-grid" id="niche-cat-grid">
+                <div class="chip" data-val="fitness" onclick="selectChip(this, 'niche-cat-grid')">🏋️ Fitness / Health</div>
+                <div class="chip" data-val="business" onclick="selectChip(this, 'niche-cat-grid')">📈 Business / Finance</div>
+                <div class="chip" data-val="beauty" onclick="selectChip(this, 'niche-cat-grid')">💄 Beauty / Aesthetics</div>
+                <div class="chip" data-val="food" onclick="selectChip(this, 'niche-cat-grid')">🍳 Food / Nutrition</div>
+                <div class="chip" data-val="travel" onclick="selectChip(this, 'niche-cat-grid')">✈️ Travel / Lifestyle</div>
+                <div class="chip" data-val="tech" onclick="selectChip(this, 'niche-cat-grid')">💻 Tech / AI</div>
+                <div class="chip" data-val="education" onclick="selectChip(this, 'niche-cat-grid')">🎓 Education</div>
+                <div class="chip" data-val="creator" onclick="selectChip(this, 'niche-cat-grid')">🎬 Creator / Personal Brand</div>
+                <div class="chip" data-val="other" onclick="selectChip(this, 'niche-cat-grid')">Other</div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-back" onclick="goBack()">←</button>
+                <button class="btn-next" onclick="validateAndNext(['input-niche'], 4)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══ STEP 5: BUSINESS MODEL ══ -->
+        <div class="step-panel" id="step-5">
+            <div class="step-eyebrow"><span class="dot"></span>Content Leverage</div>
+            <h2 class="q-title">What's your <em>main offer</em>?</h2>
+            <p class="q-sub">What do you ultimately want people to buy, book, or join? Select all that apply.</p>
+            <p class="select-hint">Multiple OK →</p>
+
+            <div class="chip-grid" id="offer-grid">
+                <div class="chip" data-val="coaching" onclick="toggleChip(this)">🤝 1:1 Coaching</div>
+                <div class="chip" data-val="course" onclick="toggleChip(this)">📚 Course / Programme</div>
+                <div class="chip" data-val="community" onclick="toggleChip(this)">👥 Paid Community</div>
+                <div class="chip" data-val="sponsors" onclick="toggleChip(this)">💰 Sponsorships / Brand Deals</div>
+                <div class="chip" data-val="consulting" onclick="toggleChip(this)">🧠 Consulting / Agency</div>
+                <div class="chip" data-val="products" onclick="toggleChip(this)">📦 Physical Products</div>
+                <div class="chip" data-val="events" onclick="toggleChip(this)">🎤 Events / Workshops</div>
+                <div class="chip" data-val="affiliate" onclick="toggleChip(this)">🔗 Affiliate / Referrals</div>
+                <div class="chip" data-val="app" onclick="toggleChip(this)">📱 SaaS / App</div>
+                <div class="chip" data-val="undecided" onclick="toggleChip(this)">🤔 Still figuring it out</div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-back" onclick="goBack()">←</button>
+                <button class="btn-next" onclick="requireChipSelection('offer-grid', 5)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══ STEP 6: CURRENT PRESENCE ══ -->
+        <div class="step-panel" id="step-6">
+            <div class="step-eyebrow"><span class="dot"></span>LLM + Search Visibility</div>
+            <h2 class="q-title">How does your presence look <em>off social</em>?</h2>
+            <p class="q-sub">Honest self-assessment. No wrong answers — this calibrates your authority score.</p>
+
+            <p style="font-size:13px; font-weight:600; color:var(--txt-mid); margin-bottom:12px; letter-spacing:.06em; text-transform:uppercase;">Google: if someone searches your name + niche</p>
+            <div class="chip-grid" id="google-grid">
+                <div class="chip" data-val="page1" onclick="selectChip(this,'google-grid')">🟢 I'm on page 1</div>
+                <div class="chip" data-val="exists" onclick="selectChip(this,'google-grid')">🟡 Something exists, not great</div>
+                <div class="chip" data-val="none" onclick="selectChip(this,'google-grid')">🔴 Nothing / only social profiles</div>
+                <div class="chip" data-val="dontknow" onclick="selectChip(this,'google-grid')">❓ I've never checked</div>
+            </div>
+
+            <p style="font-size:13px; font-weight:600; color:var(--txt-mid); margin-bottom:12px; letter-spacing:.06em; text-transform:uppercase; margin-top:8px;">ChatGPT / AI: if someone asks about your niche</p>
+            <div class="chip-grid" id="ai-grid">
+                <div class="chip" data-val="mentioned" onclick="selectChip(this,'ai-grid')">🟢 It mentions or recommends me</div>
+                <div class="chip" data-val="others" onclick="selectChip(this,'ai-grid')">🟡 It mentions competitors, not me</div>
+                <div class="chip" data-val="generic" onclick="selectChip(this,'ai-grid')">🔴 Generic advice, no names</div>
+                <div class="chip" data-val="untested" onclick="selectChip(this,'ai-grid')">❓ Never tested this</div>
+            </div>
+
+            <p style="font-size:13px; font-weight:600; color:var(--txt-mid); margin-bottom:12px; letter-spacing:.06em; text-transform:uppercase; margin-top:8px;">Website: do you have one?</p>
+            <div class="chip-grid" id="website-grid">
+                <div class="chip" data-val="yes_good" onclick="selectChip(this,'website-grid')">✅ Yes, SEO-optimised</div>
+                <div class="chip" data-val="yes_basic" onclick="selectChip(this,'website-grid')">🟡 Yes, basic / link-in-bio</div>
+                <div class="chip" data-val="no" onclick="selectChip(this,'website-grid')">❌ No website</div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-back" onclick="goBack()">←</button>
+                <button class="btn-next" onclick="goNext()">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══ STEP 7: DIRECTION ══ -->
+        <div class="step-panel" id="step-7">
+            <div class="step-eyebrow"><span class="dot"></span>Content Direction</div>
+            <h2 class="q-title">What tone and direction <em>defines</em> your brand?</h2>
+            <p class="q-sub">How do you want to be perceived? Select up to 4 that feel most true.</p>
+            <p class="select-hint">Up to 4 →</p>
+
+            <div class="chip-grid" id="tone-grid">
+                <div class="chip" data-val="authoritative" onclick="toggleChipMax(this,'tone-grid',4)">🎯 Authoritative / Expert</div>
+                <div class="chip" data-val="inspirational" onclick="toggleChipMax(this,'tone-grid',4)">✨ Inspirational</div>
+                <div class="chip" data-val="educational" onclick="toggleChipMax(this,'tone-grid',4)">📖 Educational / Deep dives</div>
+                <div class="chip" data-val="raw" onclick="toggleChipMax(this,'tone-grid',4)">🔥 Raw / Unfiltered</div>
+                <div class="chip" data-val="premium" onclick="toggleChipMax(this,'tone-grid',4)">💎 Premium / High-end</div>
+                <div class="chip" data-val="relatable" onclick="toggleChipMax(this,'tone-grid',4)">🤗 Relatable / Everyday</div>
+                <div class="chip" data-val="contrarian" onclick="toggleChipMax(this,'tone-grid',4)">⚡ Contrarian / Bold takes</div>
+                <div class="chip" data-val="methodical" onclick="toggleChipMax(this,'tone-grid',4)">🔬 Methodical / Data-driven</div>
+                <div class="chip" data-val="storyteller" onclick="toggleChipMax(this,'tone-grid',4)">📖 Storyteller</div>
+                <div class="chip" data-val="playful" onclick="toggleChipMax(this,'tone-grid',4)">😄 Playful / Humorous</div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-back" onclick="goBack()">←</button>
+                <button class="btn-next" onclick="requireChipSelection('tone-grid', 7)">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══ STEP 8: ANTI-VISION ══ -->
+        <div class="step-panel" id="step-8">
+            <div class="step-eyebrow"><span class="dot"></span>Anti-Vision — What NOT to Build</div>
+            <h2 class="q-title">What do you <em>never</em> want to be associated with?</h2>
+            <p class="q-sub">This shapes your anti-positioning — the guardrails of your brand. The clearer your anti-vision, the sharper your authority signal. Select all that apply.</p>
+            <p class="select-hint">Select all that should be avoided →</p>
+
+            <div id="anti-grid" style="margin-bottom:28px;">
+                <div class="anti-card" data-val="guru" onclick="toggleAnti(this)">
+                    <div class="anti-check">✓</div>
+                    <div>
+                        <div class="anti-label">❌ Guru / Hype culture</div>
+                        <div class="anti-desc">"I made $10M in 30 days" framing, fake urgency, lifestyle flexing without substance.</div>
+                    </div>
+                </div>
+                <div class="anti-card" data-val="generic" onclick="toggleAnti(this)">
+                    <div class="anti-check">✓</div>
+                    <div>
+                        <div class="anti-label">❌ Generic / "Just post consistently"</div>
+                        <div class="anti-desc">Surface-level content that could belong to anyone. No differentiated point of view.</div>
+                    </div>
+                </div>
+                <div class="anti-card" data-val="clickbait" onclick="toggleAnti(this)">
+                    <div class="anti-check">✓</div>
+                    <div>
+                        <div class="anti-label">❌ Clickbait and outrage farming</div>
+                        <div class="anti-desc">Engagement via controversy, misleading thumbnails, manufactured drama.</div>
+                    </div>
+                </div>
+                <div class="anti-card" data-val="personal_overshare" onclick="toggleAnti(this)">
+                    <div class="anti-check">✓</div>
+                    <div>
+                        <div class="anti-label">❌ Over-personal / trauma dumping</div>
+                        <div class="anti-desc">Using personal struggle as the primary hook without building real expertise positioning.</div>
+                    </div>
+                </div>
+                <div class="anti-card" data-val="commodity" onclick="toggleAnti(this)">
+                    <div class="anti-check">✓</div>
+                    <div>
+                        <div class="anti-label">❌ Commodified / race to the bottom</div>
+                        <div class="anti-desc">Competing on price, offering everything to everyone, no clear premium positioning.</div>
+                    </div>
+                </div>
+                <div class="anti-card" data-val="imitation" onclick="toggleAnti(this)">
+                    <div class="anti-check">✓</div>
+                    <div>
+                        <div class="anti-label">❌ Derivative / imitating bigger names</div>
+                        <div class="anti-desc">Building identity by comparing to or reacting to established authorities rather than owning your lane.</div>
+                    </div>
+                </div>
+                <div class="anti-card" data-val="jargon" onclick="toggleAnti(this)">
+                    <div class="anti-check">✓</div>
+                    <div>
+                        <div class="anti-label">❌ Jargon-heavy / inaccessible</div>
+                        <div class="anti-desc">So technical that the audience shrinks to insiders only. Authority without reach.</div>
+                    </div>
+                </div>
+                <div class="anti-card" data-val="scattered" onclick="toggleAnti(this)">
+                    <div class="anti-check">✓</div>
+                    <div>
+                        <div class="anti-label">❌ Topic scatter / no clear niche</div>
+                        <div class="anti-desc">Posting about 10 unrelated things. Search engines and AI cannot build a coherent entity from this.</div>
+                    </div>
+                </div>
+            </div>
+
+            <p style="font-size:13px; font-weight:600; color:var(--txt-mid); margin-bottom:10px;">Anything else to avoid? (optional)</p>
+            <textarea class="text-input" id="input-antivision-custom" placeholder="e.g. I never want to appear salesy or use fear-based marketing..." rows="3"></textarea>
+
+            <div class="btn-row">
+                <button class="btn-back" onclick="goBack()">←</button>
+                <button class="btn-next" onclick="goNext()">Continue →</button>
+                <button class="btn-skip" onclick="goNext()">Skip</button>
+            </div>
+        </div>
+
+        <!-- ══ STEP 9: URGENCY + CONTEXT ══ -->
+        <div class="step-panel" id="step-9">
+            <div class="step-eyebrow"><span class="dot"></span>Readiness</div>
+            <h2 class="q-title">Where are you right now?</h2>
+            <p class="q-sub">This helps me understand your urgency and tailor the audit.</p>
+
+            <p style="font-size:13px; font-weight:600; color:var(--txt-mid); margin-bottom:12px; letter-spacing:.06em; text-transform:uppercase;">Biggest blocker right now</p>
+            <div class="chip-grid" id="blocker-grid">
+                <div class="chip" data-val="time" onclick="selectChip(this,'blocker-grid')">⏱️ No time to build it</div>
+                <div class="chip" data-val="knowledge" onclick="selectChip(this,'blocker-grid')">🧠 Don't know how SEO works</div>
+                <div class="chip" data-val="cost" onclick="selectChip(this,'blocker-grid')">💸 Cost / budget uncertainty</div>
+                <div class="chip" data-val="priority" onclick="selectChip(this,'blocker-grid')">📋 It's not been a priority</div>
+                <div class="chip" data-val="trust" onclick="selectChip(this,'blocker-grid')">🔍 Haven't found the right person</div>
+            </div>
+
+            <p style="font-size:13px; font-weight:600; color:var(--txt-mid); margin-bottom:12px; letter-spacing:.06em; text-transform:uppercase; margin-top:8px;">Timeline: when do you want this live?</p>
+            <div class="scale-grid" id="timeline-grid">
+                <div class="scale-opt" data-val="asap" onclick="selectScale(this,'timeline-grid')">
+                    <span class="scale-num">🔥</span>
+                    <span class="scale-label">ASAP</span>
+                </div>
+                <div class="scale-opt" data-val="1month" onclick="selectScale(this,'timeline-grid')">
+                    <span class="scale-num">1</span>
+                    <span class="scale-label">Month</span>
+                </div>
+                <div class="scale-opt" data-val="3months" onclick="selectScale(this,'timeline-grid')">
+                    <span class="scale-num">3</span>
+                    <span class="scale-label">Months</span>
+                </div>
+                <div class="scale-opt" data-val="exploring" onclick="selectScale(this,'timeline-grid')">
+                    <span class="scale-num">🤔</span>
+                    <span class="scale-label">Exploring</span>
+                </div>
+            </div>
+
+            <p style="font-size:13px; font-weight:600; color:var(--txt-mid); margin-bottom:12px; letter-spacing:.06em; text-transform:uppercase; margin-top:8px;">Anything you want me to know? (optional)</p>
+            <textarea class="text-input" id="input-context" placeholder="Additional context, goals, current challenges..." rows="3"></textarea>
+
+            <div class="btn-row">
+                <button class="btn-back" onclick="goBack()">←</button>
+                <button class="btn-next" onclick="submitForm()">See My Authority Score →</button>
+            </div>
+        </div>
+
+        <!-- ══ RESULT ══ -->
+        <div class="step-panel" id="step-result">
+            <div class="result-panel">
+                <div class="step-eyebrow" style="justify-content:center;"><span class="dot"></span>Authority Mapping — Complete</div>
+
+                <div class="result-score-ring" id="score-ring">
+                    <svg width="126" height="126" viewBox="0 0 126 126">
+                        <circle cx="63" cy="63" r="57" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="3"/>
+                        <circle id="score-arc" cx="63" cy="63" r="57" fill="none" stroke="#E8FF47" stroke-width="3"
+                            stroke-linecap="round" stroke-dasharray="358" stroke-dashoffset="358"
+                            style="transition: stroke-dashoffset 1.5s cubic-bezier(.22,1,.36,1) .3s;"/>
+                    </svg>
+                    <div>
+                        <div class="result-score-num" id="score-display">0</div>
+                        <div class="result-score-label">/100</div>
+                    </div>
+                </div>
+
+                <h2 class="serif" style="font-size:clamp(24px,5vw,36px); margin-bottom:8px;" id="result-headline">Mapping Complete</h2>
+                <p style="font-size:14px; color:var(--txt-mid); line-height:1.7; max-width:500px; margin:0 auto 20px;" id="result-desc"></p>
+
+                <div class="result-tags" id="result-tags"></div>
+
+                <div class="result-summary" id="result-summary"></div>
+
+                <div style="max-width:480px; margin:0 auto;">
+                    <!-- REPLACE href with your actual Calendly link -->
+                    <a href="https://calendly.com/YOUR_LINK" target="_blank" class="btn-calendly">
+                        📅 Talk to Me Directly — Book a Call
+                    </a>
+                    <p class="mono" style="font-size:11px; color:var(--txt-faint); letter-spacing:.1em; text-align:center;">FREE 20-MIN AUTHORITY AUDIT CALL · NO COMMITMENT</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+const TOTAL_STEPS = 9;
+let currentStep = 0;
+
+const state = {
+    name: '', handle: '',
+    primaryPlatform: '',
+    secondaryChannels: [],
+    niche: '', nicheCategory: '',
+    offers: [],
+    google: '', ai: '', website: '',
+    tones: [],
+    antiVision: [], antiCustom: '',
+    blocker: '', timeline: '',
+    context: ''
+};
+
+/* ════════════════════════════════
+   STEP NAVIGATION
+════════════════════════════════ */
+function updateUI() {
+    const pct = currentStep === 0 ? 2 : Math.round((currentStep / TOTAL_STEPS) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('step-cur').textContent = Math.max(1, currentStep);
+    document.getElementById('step-total').textContent = TOTAL_STEPS;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showStep(n) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    const id = n === 'result' ? 'step-result' : `step-${n}`;
+    const panel = document.getElementById(id);
+    if (panel) panel.classList.add('active');
+    updateUI();
+}
+
+function goNext() {
+    collectState();
+    currentStep++;
+    showStep(currentStep);
+}
+
+function goBack() {
+    if (currentStep > 0) { currentStep--; showStep(currentStep); }
+}
+
+function validateAndNext(inputIds, stepNum) {
+    let valid = true;
+    inputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el.value.trim()) {
+            el.style.borderColor = 'var(--accent2)';
+            el.style.boxShadow = '0 0 0 3px rgba(255,59,92,.15)';
+            setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 2000);
+            valid = false;
+        }
+    });
+    if (valid) goNext();
+}
+
+function requireSelection(gridId, stepNum) {
+    const selected = document.querySelector(`#${gridId} .opt-card.selected`);
+    if (!selected) {
+        const grid = document.getElementById(gridId);
+        grid.style.outline = '1px solid var(--accent2)';
+        grid.style.borderRadius = '8px';
+        setTimeout(() => { grid.style.outline = ''; }, 1500);
+        return;
+    }
+    goNext();
+}
+
+function requireChipSelection(gridId, stepNum) {
+    const selected = document.querySelector(`#${gridId} .chip.selected`);
+    if (!selected) {
+        const grid = document.getElementById(gridId);
+        grid.style.outline = '1px solid var(--accent2)';
+        grid.style.borderRadius = '8px';
+        setTimeout(() => { grid.style.outline = ''; }, 1500);
+        return;
+    }
+    goNext();
+}
+
+/* ════════════════════════════════
+   INTERACTION HELPERS
+════════════════════════════════ */
+function selectCard(el, gridId, multi) {
+    if (!multi) {
+        document.querySelectorAll(`#${gridId} .opt-card`).forEach(c => c.classList.remove('selected'));
+    }
+    el.classList.toggle('selected');
+}
+
+function selectChip(el, gridId) {
+    document.querySelectorAll(`#${gridId} .chip`).forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function toggleChip(el) {
+    el.classList.toggle('selected');
+}
+
+function toggleChipMax(el, gridId, max) {
+    if (el.classList.contains('selected')) {
+        el.classList.remove('selected');
+        return;
+    }
+    const selected = document.querySelectorAll(`#${gridId} .chip.selected`);
+    if (selected.length >= max) {
+        // flash the grid
+        const grid = document.getElementById(gridId);
+        grid.style.transition = 'opacity .1s';
+        grid.style.opacity = '.6';
+        setTimeout(() => { grid.style.opacity = '1'; }, 200);
+        return;
+    }
+    el.classList.add('selected');
+}
+
+function selectScale(el, gridId) {
+    document.querySelectorAll(`#${gridId} .scale-opt`).forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function toggleAnti(el) {
+    el.classList.toggle('selected');
+}
+
+/* ════════════════════════════════
+   COLLECT STATE
+════════════════════════════════ */
+function collectState() {
+    const n = document.getElementById('input-name');
+    const h = document.getElementById('input-handle');
+    if (n) state.name = n.value.trim();
+    if (h) state.handle = h.value.trim();
+
+    const pSel = document.querySelector('#platform-grid .opt-card.selected');
+    if (pSel) state.primaryPlatform = pSel.dataset.val;
+
+    state.secondaryChannels = [...document.querySelectorAll('#secondary-grid .chip.selected')].map(c => c.dataset.val);
+
+    const ni = document.getElementById('input-niche');
+    if (ni) state.niche = ni.value.trim();
+    const ncSel = document.querySelector('#niche-cat-grid .chip.selected');
+    if (ncSel) state.nicheCategory = ncSel.dataset.val;
+
+    state.offers = [...document.querySelectorAll('#offer-grid .chip.selected')].map(c => c.dataset.val);
+
+    const gSel = document.querySelector('#google-grid .chip.selected');
+    const aSel = document.querySelector('#ai-grid .chip.selected');
+    const wSel = document.querySelector('#website-grid .chip.selected');
+    if (gSel) state.google = gSel.dataset.val;
+    if (aSel) state.ai = aSel.dataset.val;
+    if (wSel) state.website = wSel.dataset.val;
+
+    state.tones = [...document.querySelectorAll('#tone-grid .chip.selected')].map(c => c.dataset.val);
+    state.antiVision = [...document.querySelectorAll('#anti-grid .anti-card.selected')].map(c => c.dataset.val);
+
+    const ac = document.getElementById('input-antivision-custom');
+    if (ac) state.antiCustom = ac.value.trim();
+
+    const bSel = document.querySelector('#blocker-grid .chip.selected');
+    if (bSel) state.blocker = bSel.dataset.val;
+    const tSel = document.querySelector('#timeline-grid .scale-opt.selected');
+    if (tSel) state.timeline = tSel.dataset.val;
+    const ctx = document.getElementById('input-context');
+    if (ctx) state.context = ctx.value.trim();
+}
+
+/* ════════════════════════════════
+   SCORING ENGINE
+════════════════════════════════ */
+function calculateScore() {
+    let score = 20; // base
+
+    // Google presence
+    if (state.google === 'page1')   score += 20;
+    if (state.google === 'exists')  score += 10;
+    if (state.google === 'none')    score += 0;
+    if (state.google === 'dontknow') score += 2;
+
+    // AI visibility
+    if (state.ai === 'mentioned')  score += 18;
+    if (state.ai === 'others')     score += 6;
+    if (state.ai === 'generic')    score += 0;
+    if (state.ai === 'untested')   score += 2;
+
+    // Website
+    if (state.website === 'yes_good')  score += 18;
+    if (state.website === 'yes_basic') score += 8;
+    if (state.website === 'no')        score += 0;
+
+    // Clear niche
+    if (state.niche.length > 10) score += 8;
+    if (state.nicheCategory && state.nicheCategory !== '') score += 4;
+
+    // Offers clarity
+    if (state.offers.length > 0 && !state.offers.includes('undecided')) score += 8;
+    if (state.offers.includes('undecided')) score -= 4;
+
+    // Secondary channels (cross-platform = better entity signal)
+    if (state.secondaryChannels.length >= 2) score += 4;
+
+    // Anti-vision clarity (good signal)
+    if (state.antiVision.length >= 2) score += 4;
+
+    return Math.min(100, Math.max(5, score));
+}
+
+function getReadiness() {
+    if (state.timeline === 'asap') return 'high';
+    if (state.timeline === '1month') return 'medium';
+    return 'low';
+}
+
+function submitForm() {
+    collectState();
+    const score = calculateScore();
+    showStep('result');
+    setTimeout(() => renderResult(score), 200);
+}
+
+/* ════════════════════════════════
+   RESULT RENDER
+════════════════════════════════ */
+function renderResult(score) {
+    // Arc animation
+    const arc = document.getElementById('score-arc');
+    const circumference = 358;
+    const offset = circumference - (score / 100) * circumference;
+    arc.style.strokeDashoffset = offset;
+
+    if (score >= 60) arc.style.stroke = '#4DFFA4';
+    else if (score >= 35) arc.style.stroke = '#E8FF47';
+    else arc.style.stroke = '#FF3B5C';
+
+    // Count up number
+    let cur = 0;
+    const target = score;
+    const display = document.getElementById('score-display');
+    const timer = setInterval(() => {
+        cur += 2;
+        if (cur >= target) { cur = target; clearInterval(timer); }
+        display.textContent = cur;
+    }, 30);
+
+    // Headline + desc
+    const hl = document.getElementById('result-headline');
+    const desc = document.getElementById('result-desc');
+    const name = state.name || 'Creator';
+
+    if (score >= 65) {
+        hl.textContent = `${name}, your foundation exists.`;
+        desc.textContent = `You have some search presence — but it's likely unstructured and missing the semantic depth that Google and AI systems need to fully index you as an authority. There's a clear gap between your audience size and your search infrastructure. That gap is fixable in 14 days.`;
+    } else if (score >= 35) {
+        hl.textContent = `${name}, you're audience-rich, infrastructure-poor.`;
+        desc.textContent = `Your content has depth. Your reach is real. But right now, every piece of authority you've built lives on platforms you don't own. The moment someone Googles you or asks ChatGPT about your niche, you're largely invisible. This is the gap the Sprint closes.`;
+    } else {
+        hl.textContent = `${name}, you're building on rented land.`;
+        desc.textContent = `You have content and an audience — but your authority infrastructure is effectively zero. Google doesn't understand you. AI systems can't surface you. Sponsors can't validate you through search. This is fixable, and 14 days is all it takes to change the foundation.`;
+    }
+
+    // Tags
+    const tagsEl = document.getElementById('result-tags');
+    tagsEl.innerHTML = '';
+    const tags = [];
+    if (state.primaryPlatform) tags.push({ label: state.primaryPlatform.toUpperCase(), cls: 'yellow' });
+    if (state.nicheCategory) tags.push({ label: state.nicheCategory, cls: 'yellow' });
+    if (state.google === 'page1') tags.push({ label: '✓ Google Present', cls: 'green' });
+    else tags.push({ label: '✗ Google Gap', cls: 'red' });
+    if (state.ai === 'mentioned') tags.push({ label: '✓ AI Visible', cls: 'green' });
+    else tags.push({ label: '✗ AI Invisible', cls: 'red' });
+    if (state.website === 'yes_good') tags.push({ label: '✓ SEO Site', cls: 'green' });
+    else if (state.website === 'no') tags.push({ label: '✗ No Website', cls: 'red' });
+    if (state.antiVision.length > 0) tags.push({ label: '✓ Anti-vision Defined', cls: 'green' });
+    if (getReadiness() === 'high') tags.push({ label: '🔥 High Urgency', cls: 'red' });
+
+    tags.forEach(t => {
+        const span = document.createElement('span');
+        span.className = `result-tag ${t.cls}`;
+        span.textContent = t.label;
+        tagsEl.appendChild(span);
+    });
+
+    // Summary
+    const summary = document.getElementById('result-summary');
+    const antiList = state.antiVision.length > 0 ? state.antiVision.join(', ') : 'Not yet defined';
+    const offerList = state.offers.length > 0 ? state.offers.join(', ') : 'TBD';
+    const toneList = state.tones.length > 0 ? state.tones.join(', ') : 'Not specified';
+
+    summary.innerHTML = `
+        <h4>// Entity Map — ${state.name || 'Your Brand'}</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; margin-top:12px;">
+            ${row('Niche Entity', state.niche || '—')}
+            ${row('Primary Channel', state.primaryPlatform || '—')}
+            ${row('Business Model', offerList)}
+            ${row('Brand Direction', toneList)}
+            ${row('Anti-Vision', antiList)}
+            ${row('Google Status', state.google || '—')}
+            ${row('LLM Visibility', state.ai || '—')}
+            ${row('Readiness', state.timeline || '—')}
+        </div>
+        ${state.context ? `<p style="font-size:12px; color:var(--txt-mid); margin-top:14px; padding-top:12px; border-top:1px solid var(--border); line-height:1.6;"><strong>Your note:</strong> ${state.context}</p>` : ''}
+    `;
+}
+
+function row(k, v) {
+    return `<div style="padding:8px 0; border-bottom:1px solid var(--border);">
+        <div class="mono" style="font-size:10px; color:var(--txt-faint); letter-spacing:.1em; text-transform:uppercase; margin-bottom:2px;">${k}</div>
+        <div style="font-size:13px; color:var(--txt); font-weight:500;">${v}</div>
+    </div>`;
+}
+
+/* Init */
+updateUI();
+</script>
+</body>
+</html>

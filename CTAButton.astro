@@ -1,0 +1,137 @@
+---
+/**
+ * CTAButton — 6 variants × 4 sizes × full states
+ * variant: primary | secondary | ghost | outline | gradient | danger
+ * size:    sm | md | lg | xl
+ * state:   default | loading | success | error | disabled
+ */
+interface Props {
+  href?:    string;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'gradient' | 'danger';
+  size?:    'sm' | 'md' | 'lg' | 'xl';
+  label:    string;
+  icon?:    string;
+  iconPos?: 'left' | 'right';
+  loading?: boolean;
+  disabled?: boolean;
+  fullWidth?: boolean;
+  class?:   string;
+  type?:    'button' | 'submit' | 'reset';
+  tracking?: string;
+}
+
+const {
+  href,
+  variant  = 'primary',
+  size     = 'md',
+  label,
+  icon,
+  iconPos  = 'right',
+  loading  = false,
+  disabled = false,
+  fullWidth= false,
+  class: cls = '',
+  type = 'button',
+  tracking,
+} = Astro.props;
+
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  href={href}
+  type={Tag === 'button' ? type : undefined}
+  class:list={['cta-btn', `cta-${variant}`, `cta-${size}`, { 'cta-loading': loading, 'cta-disabled': disabled, 'cta-full': fullWidth }, 'ripple', cls]}
+  disabled={disabled || loading}
+  aria-disabled={disabled || loading}
+  data-tracking={tracking}
+>
+  {loading && <span class="cta-spinner" aria-hidden="true"></span>}
+  {icon && iconPos === 'left' && <span class="cta-icon" aria-hidden="true">{icon}</span>}
+  <span class="cta-label">{label}</span>
+  {icon && iconPos === 'right' && <span class="cta-icon" aria-hidden="true">{icon}</span>}
+</Tag>
+
+<style>
+/* Base */
+.cta-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  border: none; cursor: pointer;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: all var(--transition-base);
+  position: relative;
+  white-space: nowrap;
+  user-select: none;
+}
+.cta-full { width: 100%; }
+
+/* Sizes */
+.cta-sm { height: 40px; padding: 0 var(--space-5);  font-size: var(--text-sm);  min-width: 120px; }
+.cta-md { height: 48px; padding: 0 var(--space-8);  font-size: var(--text-base); min-width: 140px; }
+.cta-lg { height: 56px; padding: 0 var(--space-10); font-size: var(--text-lg);  min-width: 180px; }
+.cta-xl { height: 64px; padding: 0 var(--space-12); font-size: var(--text-xl);  min-width: 220px; font-weight: 700; }
+
+/* Primary */
+.cta-primary {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255,107,53,0.4);
+}
+.cta-primary:hover { background: var(--color-primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-glow); text-decoration: none; }
+.cta-primary:active { transform: translateY(0); }
+
+/* Secondary */
+.cta-secondary { background: var(--color-secondary); color: #000; box-shadow: 0 4px 16px rgba(0,229,255,0.3); }
+.cta-secondary:hover { background: var(--color-secondary-dark); transform: translateY(-2px); text-decoration: none; }
+
+/* Ghost */
+.cta-ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+.cta-ghost:hover { background: rgba(255,107,53,0.1); text-decoration: none; }
+
+/* Outline */
+.cta-outline { background: transparent; color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.2); }
+.cta-outline:hover { border-color: var(--color-primary); color: var(--color-primary); text-decoration: none; }
+
+/* Gradient */
+.cta-gradient {
+  background: var(--gradient-primary);
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(255,107,53,0.3);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+}
+.cta-gradient:hover { background-position: 100% 50%; transform: translateY(-2px); text-decoration: none; }
+
+/* Danger */
+.cta-danger {
+  background: var(--color-error);
+  color: #fff;
+  animation: danger-pulse 2s infinite;
+}
+@keyframes danger-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.6); }
+  50%       { box-shadow: 0 0 0 10px rgba(255,59,48,0); }
+}
+
+/* States */
+.cta-loading { opacity: 0.8; cursor: wait; }
+.cta-disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+/* Spinner */
+.cta-spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>

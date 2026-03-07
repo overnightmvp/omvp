@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#FAFAF8">
+    <title>Authority Infrastructure — For Instagram & TikTok Creators</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════
+           DESIGN TOKENS
+        ═══════════════════════════ */
+        :root {
+            --white:      #FAFAF8;
+            --off:        #F2F1EE;
+            --card:       #EEECEA;
+            --ink:        #0D0D0C;
+            --ink-mid:    rgba(13,13,12,0.62);
+            --ink-faint:  rgba(13,13,12,0.36);
+            --ink-ghost:  rgba(13,13,12,0.10);
+            --accent:     #FF3B5C;          /* Instagram/TikTok red-pink */
+            --accent2:    #1A1A1A;
+            --gold:       #C9A84C;
+            --border:     rgba(13,13,12,0.10);
+            --border-md:  rgba(13,13,12,0.18);
+            --radius:     3px;
+            --section-v:  clamp(80px,10vw,130px);
+            --gutter:     clamp(20px,5vw,48px);
+            --max-w:      1120px;
+        }
+
+        *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+        html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+
+        body {
+            font-family:'Geist',sans-serif;
+            background:var(--white);
+            color:var(--ink);
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        /* subtle paper grain */
+        body::after {
+            content:'';
+            position:fixed; inset:0; z-index:500; pointer-events:none;
+            opacity:.028;
+            background-image:url("https://grainy-gradients.vercel.app/noise.svg");
+        }
+
+        /* ═══════════════════════════
+           TYPOGRAPHY
+        ═══════════════════════════ */
+        .serif   { font-family:'Cormorant Garamond',serif; }
+        .mono    { font-family:'Geist Mono',monospace; }
+
+        .display {
+            font-family:'Cormorant Garamond',serif;
+            font-weight:600;
+            line-height:.96;
+            letter-spacing:-.02em;
+            color:var(--ink);
+        }
+
+        /* ═══════════════════════════
+           REVEAL ANIMATIONS
+        ═══════════════════════════ */
+        .reveal, .reveal-up, .reveal-left, .reveal-right {
+            opacity:0;
+            transition: opacity .8s cubic-bezier(.22,1,.36,1),
+                        transform .8s cubic-bezier(.22,1,.36,1);
+        }
+        .reveal       { transform:translateY(20px); }
+        .reveal-up    { transform:translateY(30px); }
+        .reveal-left  { transform:translateX(-24px); }
+        .reveal-right { transform:translateX(24px); }
+        .reveal.active,.reveal-up.active,.reveal-left.active,.reveal-right.active {
+            opacity:1; transform:none;
+        }
+
+        [data-d="1"]{ transition-delay:.07s; }
+        [data-d="2"]{ transition-delay:.14s; }
+        [data-d="3"]{ transition-delay:.21s; }
+        [data-d="4"]{ transition-delay:.28s; }
+        [data-d="5"]{ transition-delay:.35s; }
+        [data-d="6"]{ transition-delay:.42s; }
+
+        /* ═══════════════════════════
+           MICROANIMATIONS
+        ═══════════════════════════ */
+
+        /* Underline grow */
+        .underline-grow {
+            display:inline; background-image:linear-gradient(var(--accent),var(--accent));
+            background-size:0% 2px; background-repeat:no-repeat; background-position:left bottom;
+            transition:background-size .45s cubic-bezier(.22,1,.36,1);
+            padding-bottom:3px;
+        }
+        .underline-grow:hover, .active .underline-grow { background-size:100% 2px; }
+
+        /* Pill counter */
+        @keyframes count-up { from{transform:translateY(6px);opacity:0} to{transform:none;opacity:1} }
+        .count-num { animation:count-up .6s cubic-bezier(.22,1,.36,1) both; }
+
+        /* Hover card lift */
+        .card-lift { transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease; }
+        .card-lift:hover { transform:translateY(-6px); box-shadow:0 20px 60px rgba(13,13,12,.1); }
+
+        /* Accent dot pulse */
+        @keyframes dot-pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:.5} }
+        .dot-live { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); animation:dot-pulse 2.2s ease-in-out infinite; vertical-align:middle; margin-right:7px; }
+
+        /* Progress bar */
+        @keyframes bar-grow { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+        .bar-fill { transform-origin:left; transform:scaleX(0); animation:bar-grow 1.4s cubic-bezier(.22,1,.36,1) both; }
+
+        /* Check mark pop */
+        @keyframes check-pop { 0%{transform:scale(0) rotate(-20deg)} 70%{transform:scale(1.2) rotate(5deg)} 100%{transform:scale(1) rotate(0)} }
+        .check-ico { display:inline-block; animation:check-pop .5s cubic-bezier(.22,1,.36,1) both; }
+
+        /* Stagger bar delays */
+        .bar-1 { animation-delay:.3s; }
+        .bar-2 { animation-delay:.5s; }
+        .bar-3 { animation-delay:.7s; }
+        .bar-4 { animation-delay:.9s; }
+
+        /* Button hover */
+        .btn-primary {
+            display:inline-flex; align-items:center; justify-content:center; gap:10px;
+            background:var(--ink); color:var(--white);
+            font-family:'Geist',sans-serif; font-size:13px; font-weight:600;
+            letter-spacing:.04em; text-transform:uppercase;
+            padding:16px 36px; border-radius:2px; text-decoration:none;
+            border:1.5px solid var(--ink);
+            transition:background .25s, color .25s, transform .15s, box-shadow .25s;
+            min-height:48px;
+        }
+        .btn-primary:hover { background:var(--accent); border-color:var(--accent); box-shadow:0 8px 32px rgba(255,59,92,.28); transform:translateY(-1px); }
+        .btn-primary:active { transform:scale(.98); }
+
+        .btn-outline {
+            display:inline-flex; align-items:center; justify-content:center; gap:10px;
+            background:transparent; color:var(--ink);
+            font-family:'Geist',sans-serif; font-size:13px; font-weight:500;
+            letter-spacing:.04em; text-transform:uppercase;
+            padding:16px 36px; border-radius:2px; text-decoration:none;
+            border:1.5px solid var(--border-md);
+            transition:border-color .25s, color .25s, transform .15s;
+            min-height:48px;
+        }
+        .btn-outline:hover { border-color:var(--ink); color:var(--ink); transform:translateY(-1px); }
+
+        .btn-full { width:100%; }
+
+        /* ═══════════════════════════
+           NAV
+        ═══════════════════════════ */
+        nav {
+            position:fixed; top:0; left:0; right:0; z-index:200;
+            background:rgba(250,250,248,.92); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+            border-bottom:1px solid var(--border);
+            padding:max(14px,env(safe-area-inset-top)) 0 14px;
+            transition:box-shadow .3s;
+        }
+        nav.scrolled { box-shadow:0 2px 24px rgba(13,13,12,.06); }
+        .nav-inner { max-width:var(--max-w); margin:0 auto; padding:0 var(--gutter); display:flex; align-items:center; justify-content:space-between; gap:16px; }
+        .nav-logo { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--ink); text-decoration:none; letter-spacing:-.01em; }
+        .nav-logo em { color:var(--accent); font-style:italic; }
+        .nav-links { display:flex; align-items:center; gap:32px; }
+        .nav-link { font-size:12px; color:var(--ink-mid); text-decoration:none; letter-spacing:.08em; text-transform:uppercase; transition:color .2s; }
+        .nav-link:hover { color:var(--ink); }
+
+        /* Hamburger */
+        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:8px; background:transparent; border:1px solid var(--border-md); border-radius:2px; }
+        .hamburger span { display:block; width:20px; height:1.5px; background:var(--ink); border-radius:1px; transition:transform .3s,opacity .3s; }
+        .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity:0; }
+        .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+        /* Mobile drawer */
+        .mobile-menu { display:none; position:fixed; top:57px; left:0; right:0; bottom:0; background:var(--white); z-index:190; padding:40px var(--gutter); flex-direction:column; gap:0; border-top:1px solid var(--border); transform:translateX(100%); opacity:0; transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .3s; overflow-y:auto; }
+        .mobile-menu.open { transform:none; opacity:1; }
+        .mobile-menu a { font-size:22px; font-family:'Cormorant Garamond',serif; font-weight:500; color:var(--ink); text-decoration:none; padding:18px 0; border-bottom:1px solid var(--border); display:block; transition:color .2s; letter-spacing:-.01em; }
+        .mobile-menu a:hover { color:var(--accent); }
+        .mobile-cta-wrap { margin-top:auto; padding-top:36px; padding-bottom:max(24px,env(safe-area-inset-bottom)); }
+
+        /* ═══════════════════════════
+           LAYOUT
+        ═══════════════════════════ */
+        section { padding:var(--section-v) var(--gutter); }
+        .container { max-width:var(--max-w); margin:0 auto; }
+        .two-col { display:grid; grid-template-columns:1fr 1fr; gap:clamp(40px,6vw,80px); }
+        .three-col { display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(16px,2.5vw,28px); }
+
+        /* ═══════════════════════════
+           LABEL / EYEBROW
+        ═══════════════════════════ */
+        .eyebrow {
+            display:inline-flex; align-items:center; gap:8px;
+            font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+            color:var(--ink-faint); margin-bottom:20px;
+        }
+        .eyebrow::before { content:''; display:block; width:20px; height:1px; background:var(--accent); }
+
+        /* ═══════════════════════════
+           HERO SECTION
+        ═══════════════════════════ */
+        .hero-bg-text {
+            position:absolute; bottom:-2%; left:50%; transform:translateX(-50%);
+            font-family:'Cormorant Garamond',serif; font-weight:700; font-style:italic;
+            font-size:clamp(80px,18vw,260px); color:rgba(13,13,12,.04);
+            white-space:nowrap; pointer-events:none; user-select:none;
+            letter-spacing:-.04em; line-height:1;
+        }
+
+        /* Platform badges */
+        .platform-badge {
+            display:inline-flex; align-items:center; gap:8px;
+            border:1px solid var(--border-md); background:var(--off);
+            border-radius:100px; padding:8px 16px 8px 10px;
+            font-size:12px; font-weight:500; color:var(--ink-mid);
+            transition:border-color .2s, background .2s;
+        }
+        .platform-badge:hover { border-color:var(--border-md); background:var(--card); }
+        .platform-icon { width:20px; height:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; }
+
+        /* ═══════════════════════════
+           TICKER
+        ═══════════════════════════ */
+        @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+        .ticker-wrap { overflow:hidden; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--off); }
+        .ticker-track { display:flex; width:max-content; animation:ticker 28s linear infinite; }
+        .ticker-track:hover { animation-play-state:paused; }
+        .ticker-item { padding:0 40px; font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); white-space:nowrap; border-right:1px solid var(--border); line-height:46px; }
+        .ticker-item.accent { color:var(--accent); }
+
+        /* ═══════════════════════════
+           PROBLEM SECTION
+        ═══════════════════════════ */
+        .problem-item { display:flex; gap:20px; padding:22px 0; border-bottom:1px solid var(--border); }
+        .prob-num { font-family:'Geist Mono',monospace; font-size:11px; color:var(--ink-faint); min-width:32px; margin-top:3px; flex-shrink:0; }
+        .prob-body strong { color:var(--ink); font-weight:600; font-size:clamp(14px,2.5vw,15px); display:block; margin-bottom:4px; }
+        .prob-body p { font-size:13px; color:var(--ink-mid); line-height:1.65; }
+
+        /* Platform pain point pills */
+        .pain-pill {
+            display:inline-flex; align-items:center; gap:6px;
+            background:var(--off); border:1px solid var(--border); border-radius:100px;
+            padding:6px 14px; font-size:12px; color:var(--ink-mid); font-weight:500;
+            margin:4px 4px 4px 0;
+            transition:border-color .2s,background .2s;
+        }
+        .pain-pill:hover { background:var(--card); border-color:var(--border-md); }
+        .pain-pill.red { color:var(--accent); border-color:rgba(255,59,92,.2); background:rgba(255,59,92,.05); }
+
+        /* ═══════════════════════════
+           STATS
+        ═══════════════════════════ */
+        .stat-card { background:var(--off); border:1px solid var(--border); border-radius:var(--radius); padding:clamp(20px,3vw,28px) clamp(18px,2.5vw,24px); }
+        .stat-num-big { font-family:'Cormorant Garamond',serif; font-size:clamp(36px,7vw,58px); font-weight:700; color:var(--ink); line-height:1; letter-spacing:-.03em; }
+        .stat-desc { font-size:12px; color:var(--ink-faint); letter-spacing:.08em; text-transform:uppercase; margin-top:8px; line-height:1.4; }
+
+        /* ═══════════════════════════
+           INSIGHT / PULL QUOTE
+        ═══════════════════════════ */
+        .pull-quote { border-left:3px solid var(--accent); padding-left:clamp(20px,3vw,32px); }
+
+        /* ═══════════════════════════
+           PROOF CASE STUDIES
+        ═══════════════════════════ */
+        .case-card { background:var(--off); border:1px solid var(--border); border-radius:var(--radius); padding:clamp(24px,3vw,32px); }
+        .case-result { display:inline-flex; align-items:center; gap:8px; background:var(--ink); color:var(--white); border-radius:100px; padding:4px 14px; font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:16px; }
+
+        /* ═══════════════════════════
+           CHECKLIST OFFER
+        ═══════════════════════════ */
+        .offer-check { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+        .offer-check-ico { color:var(--accent); font-size:14px; flex-shrink:0; margin-top:2px; }
+        .offer-check-title { font-size:14px; font-weight:600; color:var(--ink); }
+        .offer-check-sub { font-size:12px; color:var(--ink-faint); margin-top:2px; line-height:1.5; }
+
+        /* ═══════════════════════════
+           COMPARISON TABLE
+        ═══════════════════════════ */
+        .compare-table { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+        .compare-row { display:grid; grid-template-columns:1fr 1fr 1fr; border-bottom:1px solid var(--border); transition:background .18s; }
+        .compare-row:hover { background:var(--off); }
+        .compare-row:last-child { border-bottom:none; }
+        .compare-cell { padding:clamp(12px,2vw,16px) clamp(14px,2vw,20px); font-size:clamp(12px,2vw,13px); }
+        .compare-head { background:var(--off); font-weight:600; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+        .compare-label { color:var(--ink-mid); border-right:1px solid var(--border); }
+        .compare-before { color:var(--accent); border-right:1px solid var(--border); }
+        .compare-after  { color:var(--ink); font-weight:600; }
+
+        /* ═══════════════════════════
+           GUARANTEE
+        ═══════════════════════════ */
+        .guarantee-strip { background:var(--ink); color:var(--white); border-radius:var(--radius); padding:clamp(32px,5vw,52px) clamp(24px,5vw,60px); text-align:center; }
+
+        /* ═══════════════════════════
+           FINAL CTA
+        ═══════════════════════════ */
+        .cta-section { background:var(--off); border-top:1px solid var(--border); }
+
+        /* ═══════════════════════════
+           FOOTER
+        ═══════════════════════════ */
+        footer { background:var(--ink); color:rgba(255,255,255,.55); padding:clamp(40px,6vw,64px) var(--gutter); }
+        .footer-logo { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:#fff; margin-bottom:8px; letter-spacing:-.01em; }
+        .footer-logo em { color:var(--accent); font-style:italic; }
+
+        /* ═══════════════════════════
+           RESPONSIVE — MOBILE
+        ═══════════════════════════ */
+        @media (max-width:768px) {
+            .nav-links { display:none; }
+            .nav-cta-d { display:none !important; }
+            .hamburger { display:flex; }
+            .mobile-menu { display:flex; }
+            .two-col { grid-template-columns:1fr !important; }
+            .three-col { grid-template-columns:1fr 1fr !important; }
+            .hide-mobile { display:none !important; }
+            .compare-row { grid-template-columns:1fr 1fr !important; }
+            .compare-before { display:none; }
+            section { padding:64px var(--gutter); }
+            .hero-bg-text { display:none; }
+        }
+        @media (max-width:440px) {
+            .three-col { grid-template-columns:1fr !important; }
+            .stat-grid-2 { grid-template-columns:1fr !important; }
+        }
+        @media (prefers-reduced-motion:reduce) {
+            *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="main-nav">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo">Authority<em>.</em></a>
+        <div class="nav-links">
+            <a href="#problem" class="nav-link">The Gap</a>
+            <a href="#system"  class="nav-link">The Sprint</a>
+            <a href="#proof"   class="nav-link">Results</a>
+            <a href="#cta"     class="nav-link">Get Audit</a>
+        </div>
+        <a href="#cta" class="btn-primary nav-cta-d" style="padding:10px 22px; font-size:12px; display:none;" id="nav-cta-d">→ Free Audit</a>
+        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <a href="#problem">The Gap</a>
+    <a href="#system">The Sprint</a>
+    <a href="#proof">Results</a>
+    <div class="mobile-cta-wrap">
+        <a href="#cta" class="btn-primary btn-full" style="font-size:14px;">→ Get My Free Authority Audit</a>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     HERO
+═══════════════════════════════════════ -->
+<section style="min-height:100svh; display:flex; align-items:center; padding-top:clamp(96px,14vw,130px); overflow:hidden; position:relative;">
+
+    <!-- Big italic background word -->
+    <span class="hero-bg-text">Infrastructure.</span>
+
+    <div class="container" style="position:relative; z-index:10;">
+
+        <!-- Platform badges -->
+        <div class="reveal" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:36px;">
+            <span class="platform-badge"><span class="platform-icon" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);">▶</span>Instagram</span>
+            <span class="platform-badge"><span class="platform-icon" style="background:#000; color:#fff;">♪</span>TikTok</span>
+            <span class="platform-badge" style="background:rgba(255,59,92,.08); border-color:rgba(255,59,92,.2); color:var(--accent);">
+                <span class="dot-live" style="width:6px;height:6px;margin-right:0;"></span>
+                Authority Gap: Unresolved
+            </span>
+        </div>
+
+        <div class="two-col" style="align-items:end; gap:clamp(32px,6vw,80px);">
+            <!-- Left -->
+            <div>
+                <div class="reveal" data-d="1">
+                    <div class="eyebrow">Authority Infrastructure Sprint</div>
+                </div>
+
+                <div class="reveal" data-d="2">
+                    <h1 class="display" style="font-size:clamp(44px,8vw,90px); margin-bottom:28px;">
+                        Your Reels<br/>
+                        Get Millions<br/>
+                        of Views.<br/>
+                        <em style="color:var(--accent);">Google Has<br/>Never Heard<br/>of You.</em>
+                    </h1>
+                </div>
+
+                <div class="reveal" data-d="3" style="margin-bottom:40px;">
+                    <p style="font-size:clamp(15px,2.5vw,17px); color:var(--ink-mid); line-height:1.75; max-width:440px; font-weight:300;">
+                        We convert your existing Instagram and TikTok content into a structured authority website that ranks on Google, indexes into AI systems, and compounds while you keep creating.
+                    </p>
+                </div>
+
+                <div class="reveal" data-d="4" style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:36px;">
+                    <a href="#cta" class="btn-primary">→ Get My Free Authority Audit</a>
+                    <a href="#system" class="btn-outline">See How It Works</a>
+                </div>
+
+                <div class="reveal" data-d="5">
+                    <p class="mono" style="font-size:11px; color:var(--ink-faint); letter-spacing:.1em;">
+                        BUILT BY A PRODUCT DESIGNER WITH 8+ YEARS RANKING #1
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: animated stat stack -->
+            <div class="reveal-right" data-d="2" style="display:flex; flex-direction:column; gap:16px;">
+
+                <div class="stat-card card-lift">
+                    <div class="eyebrow" style="margin-bottom:12px;">The Reality Check</div>
+                    <div style="display:flex; flex-direction:column; gap:14px;">
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <span style="font-size:12px; color:var(--ink-mid);">Instagram Presence</span>
+                                <span style="font-size:12px; font-weight:600; color:var(--ink);">Strong</span>
+                            </div>
+                            <div style="height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
+                                <div class="bar-fill bar-1" style="height:100%; width:88%; background:linear-gradient(90deg,#f09433,#dc2743); border-radius:2px;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <span style="font-size:12px; color:var(--ink-mid);">TikTok Reach</span>
+                                <span style="font-size:12px; font-weight:600; color:var(--ink);">Growing</span>
+                            </div>
+                            <div style="height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
+                                <div class="bar-fill bar-2" style="height:100%; width:72%; background:#010101; border-radius:2px;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <span style="font-size:12px; color:var(--ink-mid);">Google Presence</span>
+                                <span style="font-size:12px; font-weight:600; color:var(--accent);">None</span>
+                            </div>
+                            <div style="height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
+                                <div class="bar-fill bar-3" style="height:100%; width:4%; background:var(--accent); border-radius:2px;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <span style="font-size:12px; color:var(--ink-mid);">AI Recognition</span>
+                                <span style="font-size:12px; font-weight:600; color:var(--accent);">Missing</span>
+                            </div>
+                            <div style="height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
+                                <div class="bar-fill bar-4" style="height:100%; width:2%; background:var(--accent); border-radius:2px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="stat-card card-lift" style="text-align:center;">
+                        <div class="stat-num-big count-num" style="font-size:clamp(28px,5vw,44px);">14</div>
+                        <div class="stat-desc">days to<br/>go live</div>
+                    </div>
+                    <div class="stat-card card-lift" style="text-align:center;">
+                        <div class="stat-num-big count-num" style="font-size:clamp(28px,5vw,44px);">$1K</div>
+                        <div class="stat-desc">fixed price<br/>full scope</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+    <div class="ticker-track">
+        <span class="ticker-item">Instagram → Google</span>
+        <span class="ticker-item accent">Authority Infrastructure</span>
+        <span class="ticker-item">TikTok → Search</span>
+        <span class="ticker-item">AI Indexing</span>
+        <span class="ticker-item accent">Schema Markup</span>
+        <span class="ticker-item">Topical Authority</span>
+        <span class="ticker-item">Compounding Search</span>
+        <span class="ticker-item accent">14 Days</span>
+        <span class="ticker-item">Sponsor Validation</span>
+        <span class="ticker-item">Semantic Structure</span>
+        <!-- dup -->
+        <span class="ticker-item">Instagram → Google</span>
+        <span class="ticker-item accent">Authority Infrastructure</span>
+        <span class="ticker-item">TikTok → Search</span>
+        <span class="ticker-item">AI Indexing</span>
+        <span class="ticker-item accent">Schema Markup</span>
+        <span class="ticker-item">Topical Authority</span>
+        <span class="ticker-item">Compounding Search</span>
+        <span class="ticker-item accent">14 Days</span>
+        <span class="ticker-item">Sponsor Validation</span>
+        <span class="ticker-item">Semantic Structure</span>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PROBLEM
+═══════════════════════════════════════ -->
+<section id="problem">
+    <div class="container">
+
+        <div class="two-col" style="align-items:start; margin-bottom:clamp(64px,9vw,100px);">
+            <div class="reveal-left">
+                <div class="eyebrow">The Gap</div>
+                <h2 class="display" style="font-size:clamp(32px,5.5vw,62px);">
+                    You're Building<br/>
+                    Fame on<br/>
+                    Rented Land.
+                </h2>
+            </div>
+            <div class="reveal-right" data-d="1" style="display:flex; flex-direction:column; justify-content:flex-end; padding-top:clamp(24px,4vw,48px);">
+                <p style="font-size:clamp(15px,2.5vw,17px); color:var(--ink-mid); line-height:1.8; font-weight:300; max-width:460px;">
+                    Instagram and TikTok can change their algorithm tomorrow. Brands get shadowbanned. Accounts get restricted. You can build 500K followers and still be invisible to the one thing that converts at the highest rate: search intent.
+                </p>
+                <div style="margin-top:24px; display:flex; flex-wrap:wrap; gap:8px;">
+                    <span class="pain-pill red">❌ Algorithm change</span>
+                    <span class="pain-pill red">❌ Shadowban</span>
+                    <span class="pain-pill red">❌ Organic reach decline</span>
+                    <span class="pain-pill red">❌ Brand deal validation fails</span>
+                    <span class="pain-pill red">❌ AI can't find you</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Problem list -->
+        <div class="reveal" data-d="1">
+            <div>
+                <div class="problem-item">
+                    <span class="prob-num">[01]</span>
+                    <div class="prob-body">
+                        <strong>When a brand Googles you, they find almost nothing.</strong>
+                        <p>Sponsors and agencies validate every creator through search before making contact. No web presence means lower deal values — regardless of follower count.</p>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <span class="prob-num">[02]</span>
+                    <div class="prob-body">
+                        <strong>ChatGPT and AI tools don't know you exist.</strong>
+                        <p>AI-powered search surfaces experts from structured web assets, not social profiles. If you're not on the web with proper schema, you're invisible to the next generation of discovery.</p>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <span class="prob-num">[03]</span>
+                    <div class="prob-body">
+                        <strong>Every post you make vanishes after 24–72 hours.</strong>
+                        <p>Stories, Reels, TikToks — they're designed to be consumed and forgotten. Search infrastructure compounds forever. Your Instagram posts do not.</p>
+                    </div>
+                </div>
+                <div class="problem-item" style="border-bottom:none;">
+                    <span class="prob-num">[04]</span>
+                    <div class="prob-body">
+                        <strong>Your expertise isn't structured — it's scattered.</strong>
+                        <p>You've shared thousands of insights across captions, carousels, and videos. None of it is organised in a way that builds durable authority signals that search engines and AI understand.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pull quote -->
+        <div class="reveal" data-d="2" style="margin-top:clamp(48px,7vw,80px); max-width:680px;">
+            <div class="pull-quote">
+                <p class="display" style="font-size:clamp(22px,4vw,38px); font-style:italic; line-height:1.2; color:var(--ink);">
+                    "Followers are attention. Authority is reputation. You can have one without the other — but only authority compounds."
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     INSIGHT / COMPARISON
+═══════════════════════════════════════ -->
+<section style="background:var(--off); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="container">
+
+        <div class="reveal" style="text-align:center; margin-bottom:clamp(40px,7vw,64px);">
+            <div class="eyebrow" style="justify-content:center;">The Insight</div>
+            <h2 class="display" style="font-size:clamp(28px,5vw,56px); max-width:700px; margin:0 auto;">
+                Your Content Already Contains<br/>
+                <em style="color:var(--accent);">Everything Search Needs.</em>
+            </h2>
+            <p style="font-size:clamp(14px,2.5vw,16px); color:var(--ink-mid); max-width:520px; margin:20px auto 0; line-height:1.75; font-weight:300;">
+                Every caption, carousel, and Reel contains topical depth, high-intent keywords, and authority signals. It's just trapped in a format search engines can't read.
+            </p>
+        </div>
+
+        <!-- Comparison table -->
+        <div class="reveal" data-d="1">
+            <div class="compare-table">
+                <div class="compare-row" style="grid-template-columns:1fr 1fr 1fr;">
+                    <div class="compare-cell compare-head compare-label">SIGNAL TYPE</div>
+                    <div class="compare-cell compare-head hide-mobile" style="border-right:1px solid var(--border);">BEFORE: SOCIAL ONLY</div>
+                    <div class="compare-cell compare-head">AFTER: WITH INFRASTRUCTURE</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Google Ranking</div>
+                    <div class="compare-cell compare-before hide-mobile" style="border-right:1px solid var(--border);">Not found</div>
+                    <div class="compare-cell compare-after">Page 1 for your niche</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">AI Recognition</div>
+                    <div class="compare-cell compare-before hide-mobile" style="border-right:1px solid var(--border);">Zero indexed context</div>
+                    <div class="compare-cell compare-after">Cited as a specialist</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Sponsor Validation</div>
+                    <div class="compare-cell compare-before hide-mobile" style="border-right:1px solid var(--border);">Profile + follower count</div>
+                    <div class="compare-cell compare-after">Web authority + portfolio</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Content Lifespan</div>
+                    <div class="compare-cell compare-before hide-mobile" style="border-right:1px solid var(--border);">24–72 hours</div>
+                    <div class="compare-cell compare-after">Compounds indefinitely</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Inbound Leads</div>
+                    <div class="compare-cell compare-before hide-mobile" style="border-right:1px solid var(--border);">DMs only</div>
+                    <div class="compare-cell compare-after">Search + DM + Email</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Asset Ownership</div>
+                    <div class="compare-cell compare-before hide-mobile" style="border-right:1px solid var(--border);">Platform controls it</div>
+                    <div class="compare-cell compare-after">You own it forever</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     PROOF
+═══════════════════════════════════════ -->
+<section id="proof">
+    <div class="container">
+        <div class="reveal" style="margin-bottom:clamp(36px,6vw,56px);">
+            <div class="eyebrow">Credibility</div>
+            <h2 class="display" style="font-size:clamp(28px,5vw,52px); max-width:580px;">
+                The Same System.<br/>
+                <em>Applied to Different Niches.</em>
+            </h2>
+            <p style="font-size:clamp(13px,2.5vw,15px); color:var(--ink-mid); margin-top:16px; max-width:440px; line-height:1.75; font-weight:300;">
+                8+ years ranking SaaS companies and local businesses #1. Now applied exclusively to content creators.
+            </p>
+        </div>
+
+        <div class="three-col reveal" data-d="1">
+            <div class="case-card card-lift">
+                <div class="case-result">✦ #1 in city</div>
+                <h3 class="serif" style="font-size:20px; font-weight:600; margin-bottom:10px; line-height:1.2;">Physical Therapist</h3>
+                <p style="font-size:13px; color:var(--ink-mid); line-height:1.65; margin-bottom:16px;">Converted YouTube and social content into structured search assets. Now ranks #1 for his niche in his city — entirely from the content he already had.</p>
+                <div style="padding-top:16px; border-top:1px solid var(--border);">
+                    <p style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint);">YouTube + Social → Search</p>
+                </div>
+            </div>
+
+            <div class="case-card card-lift" data-d="1">
+                <div class="case-result" style="background:var(--off); color:var(--ink);">✦ +Local Authority</div>
+                <h3 class="serif" style="font-size:20px; font-weight:600; margin-bottom:10px; line-height:1.2;">Muay Thai Gym — Bangkok</h3>
+                <p style="font-size:13px; color:var(--ink-mid); line-height:1.65; margin-bottom:16px;">Strengthened local authority positioning using the same content-to-infrastructure conversion system. Social presence became durable search equity.</p>
+                <div style="padding-top:16px; border-top:1px solid var(--border);">
+                    <p style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint);">Local + Social → Authority</p>
+                </div>
+            </div>
+
+            <div class="case-card card-lift" data-d="2">
+                <div class="case-result" style="background:rgba(255,59,92,.1); color:var(--accent);">✦ +Search Visibility</div>
+                <h3 class="serif" style="font-size:20px; font-weight:600; margin-bottom:10px; line-height:1.2;">Aesthetic Clinic — Brazil</h3>
+                <p style="font-size:13px; color:var(--ink-mid); line-height:1.65; margin-bottom:16px;">Increased search visibility using structured niche content from their social channels. Same content, converted into compounding search infrastructure.</p>
+                <div style="padding-top:16px; border-top:1px solid var(--border);">
+                    <p style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint);">Social Content → Search Equity</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operator note -->
+        <div class="reveal" data-d="3" style="margin-top:clamp(40px,6vw,64px); padding:clamp(24px,4vw,40px); background:var(--off); border:1px solid var(--border); border-radius:var(--radius);">
+            <div style="display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
+                <div style="flex:1; min-width:240px;">
+                    <p class="eyebrow" style="margin-bottom:10px;">Operator Note</p>
+                    <p style="font-size:clamp(14px,2.5vw,16px); color:var(--ink); line-height:1.7; font-weight:400;">
+                        I am not selling SEO. I am not selling websites. I am building <strong>authority infrastructure</strong> — the durable foundation that makes your expertise discoverable beyond the feed.
+                    </p>
+                </div>
+                <div style="flex-shrink:0; text-align:center; padding:clamp(16px,2vw,24px) clamp(24px,3vw,36px); background:var(--ink); border-radius:var(--radius); color:white;">
+                    <div class="stat-num-big" style="color:white; font-size:clamp(30px,5vw,44px);">8+</div>
+                    <div style="font-size:11px; color:rgba(255,255,255,.55); letter-spacing:.1em; text-transform:uppercase; margin-top:6px;">Years ranking<br/>competitive terms #1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     THE SYSTEM / OFFER
+═══════════════════════════════════════ -->
+<section id="system" style="background:var(--off); border-top:1px solid var(--border);">
+    <div class="container">
+        <div class="two-col" style="align-items:start;">
+
+            <!-- Left: what I do -->
+            <div class="reveal-left">
+                <div class="eyebrow">Authority Infrastructure Sprint</div>
+                <h2 class="display" style="font-size:clamp(30px,5vw,54px); margin-bottom:8px;">
+                    14 Days.<br/>
+                    Your Authority.<br/>
+                    <em style="color:var(--accent);">On Google.</em>
+                </h2>
+
+                <div style="display:flex; align-items:baseline; gap:10px; margin:20px 0 32px; flex-wrap:wrap;">
+                    <span style="font-family:'Cormorant Garamond',serif; font-size:clamp(40px,7vw,58px); font-weight:700; color:var(--ink); letter-spacing:-.03em;">$1,000</span>
+                    <span style="font-size:12px; color:var(--ink-faint); font-weight:500;">ONE-TIME · FIXED SCOPE</span>
+                </div>
+
+                <div>
+                    <div class="offer-check reveal" data-d="1">
+                        <span class="check-ico">✦</span>
+                        <div><div class="offer-check-title">Authority website built from scratch</div><div class="offer-check-sub">Designed, developed, and deployed. Yours to own forever — not a template, not shared hosting.</div></div>
+                    </div>
+                    <div class="offer-check reveal" data-d="2">
+                        <span class="check-ico" style="animation-delay:.1s;">✦</span>
+                        <div><div class="offer-check-title">Positioning structured around your niche</div><div class="offer-check-sub">Clear topical authority so Google, brands, and AI understand exactly what you're the expert in.</div></div>
+                    </div>
+                    <div class="offer-check reveal" data-d="3">
+                        <span class="check-ico" style="animation-delay:.2s;">✦</span>
+                        <div><div class="offer-check-title">10–20 posts/Reels → SEO-structured articles</div><div class="offer-check-sub">Your best content converted into indexed long-form assets that compound in search.</div></div>
+                    </div>
+                    <div class="offer-check reveal" data-d="4">
+                        <span class="check-ico" style="animation-delay:.3s;">✦</span>
+                        <div><div class="offer-check-title">Schema markup for AI indexing</div><div class="offer-check-sub">JSON-LD structured data so ChatGPT, Perplexity, and Google SGE recognise you as the specialist.</div></div>
+                    </div>
+                    <div class="offer-check reveal" data-d="5">
+                        <span class="check-ico" style="animation-delay:.4s;">✦</span>
+                        <div><div class="offer-check-title">Topical clustering + on-page architecture</div><div class="offer-check-sub">Semantic structure that signals years of expertise — not just a pretty website.</div></div>
+                    </div>
+                    <div class="offer-check reveal" data-d="1" style="border-bottom:none;">
+                        <span class="check-ico" style="animation-delay:.5s;">✦</span>
+                        <div><div class="offer-check-title">Lead capture connected to your offers</div><div class="offer-check-sub">Search traffic converts into real inbound — brand deals, clients, speaking, courses.</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: what changes -->
+            <div class="reveal-right" data-d="1">
+                <div class="eyebrow">After 14 Days</div>
+
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="stat-card card-lift" style="padding:20px 24px; display:flex; gap:16px; align-items:flex-start;">
+                        <span style="font-size:24px; flex-shrink:0;">🏗️</span>
+                        <div><strong style="font-size:14px; font-weight:600; display:block; margin-bottom:4px;">A real asset you own</strong><span style="font-size:13px; color:var(--ink-faint);">Not a social profile someone else controls. A domain. A site. Yours.</span></div>
+                    </div>
+                    <div class="stat-card card-lift" style="padding:20px 24px; display:flex; gap:16px; align-items:flex-start;">
+                        <span style="font-size:24px; flex-shrink:0;">🔍</span>
+                        <div><strong style="font-size:14px; font-weight:600; display:block; margin-bottom:4px;">Google presence beyond social</strong><span style="font-size:13px; color:var(--ink-faint);">Show up where brands, clients, and press look first — before they DM you.</span></div>
+                    </div>
+                    <div class="stat-card card-lift" style="padding:20px 24px; display:flex; gap:16px; align-items:flex-start;">
+                        <span style="font-size:24px; flex-shrink:0;">📈</span>
+                        <div><strong style="font-size:14px; font-weight:600; display:block; margin-bottom:4px;">Compounding infrastructure</strong><span style="font-size:13px; color:var(--ink-faint);">Every post you publish now feeds your search authority automatically.</span></div>
+                    </div>
+                    <div class="stat-card card-lift" style="padding:20px 24px; display:flex; gap:16px; align-items:flex-start;">
+                        <span style="font-size:24px; flex-shrink:0;">🤝</span>
+                        <div><strong style="font-size:14px; font-weight:600; display:block; margin-bottom:4px;">Sponsor credibility unlocked</strong><span style="font-size:13px; color:var(--ink-faint);">When brands validate you, they Google you. Now what they find matches your worth.</span></div>
+                    </div>
+                    <div class="stat-card card-lift" style="padding:20px 24px; display:flex; gap:16px; align-items:flex-start;">
+                        <span style="font-size:24px; flex-shrink:0;">🤖</span>
+                        <div><strong style="font-size:14px; font-weight:600; display:block; margin-bottom:4px;">AI systems recognise you</strong><span style="font-size:13px; color:var(--ink-faint);">Structured schema means ChatGPT, Perplexity, and AI search can cite you as an authority.</span></div>
+                    </div>
+                </div>
+
+                <div style="margin-top:28px; padding:20px 24px; border-left:3px solid var(--accent); background:rgba(255,59,92,.04); border-radius:0 3px 3px 0;">
+                    <p style="font-size:15px; font-weight:500; color:var(--ink); line-height:1.5;">You keep posting.</p>
+                    <p style="font-size:15px; color:var(--ink-mid); line-height:1.5;">Your authority compounds in the background.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     GUARANTEE
+═══════════════════════════════════════ -->
+<section style="padding-top:0; padding-bottom:var(--section-v);">
+    <div class="container">
+        <div class="reveal guarantee-strip">
+            <div style="font-size:11px; color:rgba(255,255,255,.45); letter-spacing:.16em; text-transform:uppercase; font-weight:600; margin-bottom:14px; font-family:'Geist Mono',monospace;">— GUARANTEE —</div>
+            <h3 class="display" style="font-size:clamp(26px,5vw,48px); color:white; margin-bottom:14px;">Delivered in 14 Days.<br/>Or Partial Refund.</h3>
+            <p style="font-size:clamp(13px,2.5vw,16px); color:rgba(255,255,255,.65); max-width:480px; margin:0 auto; line-height:1.75;">Clear scope. Clear timeline. No vague deliverables. If I miss the deadline, you don't pay in full. It's that simple.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CTA
+═══════════════════════════════════════ -->
+<section id="cta" class="cta-section" style="text-align:center;">
+    <div class="container" style="max-width:680px;">
+
+        <div class="reveal">
+            <div class="eyebrow" style="justify-content:center;">Free Authority Audit</div>
+            <h2 class="display" style="font-size:clamp(34px,7vw,68px); margin-bottom:20px;">
+                Want to See<br/>
+                <em style="color:var(--accent);">What You're Missing?</em>
+            </h2>
+            <p style="font-size:clamp(14px,2.5vw,17px); color:var(--ink-mid); line-height:1.8; max-width:500px; margin:0 auto 40px; font-weight:300;">
+                I'll send you a personalised 3-minute audit showing exactly where you rank (or don't), what search equity your content is wasting, and how fast we can fix it.
+            </p>
+        </div>
+
+        <div class="reveal" data-d="1" style="margin-bottom:16px;">
+            <!-- Replace href with Calendly or your funnel link -->
+            <a href="#" class="btn-primary btn-full" style="font-size:clamp(13px,2.5vw,15px); padding:clamp(16px,3vw,20px) clamp(24px,4vw,44px);">
+                → Get My Free Authority Audit
+            </a>
+        </div>
+
+        <div class="reveal" data-d="2" style="margin-bottom:56px;">
+            <p class="mono" style="font-size:11px; color:var(--ink-faint); letter-spacing:.1em;">NO SALES CALL REQUIRED &nbsp;·&nbsp; DELIVERED WITHIN 24H</p>
+        </div>
+
+        <!-- Audit breakdown -->
+        <div class="reveal" data-d="3">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; text-align:left;">
+                <div style="padding:20px 22px; border:1px solid var(--border); border-radius:var(--radius); background:var(--white);">
+                    <p class="mono" style="font-size:10px; color:var(--accent); font-weight:600; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px;">01</p>
+                    <p style="font-size:13px; font-weight:600; color:var(--ink); line-height:1.4;">What Google currently understands about you</p>
+                </div>
+                <div style="padding:20px 22px; border:1px solid var(--border); border-radius:var(--radius); background:var(--white);">
+                    <p class="mono" style="font-size:10px; color:var(--accent); font-weight:600; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px;">02</p>
+                    <p style="font-size:13px; font-weight:600; color:var(--ink); line-height:1.4;">Where your niche authority currently stands</p>
+                </div>
+                <div style="padding:20px 22px; border:1px solid var(--border); border-radius:var(--radius); background:var(--white);">
+                    <p class="mono" style="font-size:10px; color:var(--accent); font-weight:600; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px;">03</p>
+                    <p style="font-size:13px; font-weight:600; color:var(--ink); line-height:1.4;">What search equity you're leaving untapped</p>
+                </div>
+                <div style="padding:20px 22px; border:1px solid var(--border); border-radius:var(--radius); background:var(--white);">
+                    <p class="mono" style="font-size:10px; color:var(--accent); font-weight:600; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px;">04</p>
+                    <p style="font-size:13px; font-weight:600; color:var(--ink); line-height:1.4;">How fast we can build the infrastructure behind your brand</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div style="max-width:var(--max-w); margin:0 auto;">
+        <div class="footer-logo">Authority<em>.</em></div>
+        <p style="font-size:13px; margin-bottom:32px; max-width:340px; line-height:1.65;">Authority infrastructure for Instagram and TikTok creators who are ready to own their niche on Google.</p>
+        <hr style="border:none; border-top:1px solid rgba(255,255,255,.1); margin-bottom:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+            <p style="font-size:11px; letter-spacing:.08em;">© 2025 AUTHORITY INFRASTRUCTURE.</p>
+            <div style="display:flex; gap:24px;">
+                <a href="#" style="font-size:11px; color:rgba(255,255,255,.4); text-decoration:none; letter-spacing:.1em; text-transform:uppercase; transition:color .2s; min-height:44px; display:inline-flex; align-items:center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'">Instagram</a>
+                <a href="#" style="font-size:11px; color:rgba(255,255,255,.4); text-decoration:none; letter-spacing:.1em; text-transform:uppercase; transition:color .2s; min-height:44px; display:inline-flex; align-items:center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'">TikTok</a>
+                <a href="#" style="font-size:11px; color:rgba(255,255,255,.4); text-decoration:none; letter-spacing:.1em; text-transform:uppercase; transition:color .2s; min-height:44px; display:inline-flex; align-items:center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'">Twitter</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+/* ── SCROLL REVEAL ── */
+const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('active'); obs.unobserve(e.target); }});
+}, { threshold: 0.07, rootMargin: '0px 0px -24px 0px' });
+document.querySelectorAll('.reveal,.reveal-up,.reveal-left,.reveal-right').forEach(el => obs.observe(el));
+
+/* Immediate hero */
+const heroEls = document.querySelectorAll('section:first-of-type .reveal, section:first-of-type .reveal-right');
+heroEls.forEach((el, i) => setTimeout(() => el.classList.add('active'), 60 + i * 130));
+
+/* ── NAV SCROLL ── */
+const nav = document.getElementById('main-nav');
+const navCtaD = document.getElementById('nav-cta-d');
+window.addEventListener('scroll', () => {
+    const s = window.scrollY;
+    nav.classList.toggle('scrolled', s > 40);
+    navCtaD.style.display = s > 300 ? 'inline-flex' : 'none';
+}, { passive: true });
+
+/* ── HAMBURGER ── */
+const ham = document.getElementById('hamburger');
+const mm  = document.getElementById('mobile-menu');
+let open  = false;
+function toggleMenu(f) {
+    open = f !== undefined ? f : !open;
+    ham.classList.toggle('open', open);
+    mm.classList.toggle('open', open);
+    ham.setAttribute('aria-expanded', open);
+    mm.setAttribute('aria-hidden', !open);
+    document.body.style.overflow = open ? 'hidden' : '';
+}
+ham.addEventListener('click', () => toggleMenu());
+mm.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggleMenu(false)));
+
+/* ── HERO PARALLAX (desktop only) ── */
+const heroSection = document.querySelector('section:first-of-type');
+const heroContent = heroSection.querySelector('.container');
+const pref = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+if (!pref) {
+    window.addEventListener('scroll', () => {
+        const s = window.scrollY;
+        if (s < 700 && window.innerWidth > 768) {
+            heroContent.style.transform = `translateY(${s * 0.09}px)`;
+            heroContent.style.opacity = Math.max(0, 1 - s / 560);
+        }
+    }, { passive: true });
+}
+
+/* ── ACTIVE NAV SECTION ── */
+const sectionEls = document.querySelectorAll('section[id]');
+const navLinks   = document.querySelectorAll('.nav-link');
+const secObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            navLinks.forEach(a => {
+                a.style.color = a.getAttribute('href') === '#' + e.target.id ? 'var(--ink)' : '';
+                a.style.fontWeight = a.getAttribute('href') === '#' + e.target.id ? '600' : '';
+            });
+        }
+    });
+}, { threshold: 0.35 });
+sectionEls.forEach(s => secObs.observe(s));
+</script>
+</body>
+</html>
