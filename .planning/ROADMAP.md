@@ -110,7 +110,7 @@ Plans:
 
 **Requirements Covered:**
 - AUTO-01 through AUTO-12
-- ONBOARD-07, ONBOARD-08, ONBOARD-09 (free page generation)
+- ONBOARD-07, ONBOARD-08 (free page generation)
 
 **Deliverables:**
 1. Next.js API routes for pipeline orchestration (simpler than n8n)
