@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { exchangeCodeForTokens, getChannelInfo } from '@/lib/youtube-oauth'
+import { getMostPopularVideo } from '@/lib/youtube-api'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -16,11 +17,11 @@ export async function GET(request: NextRequest) {
     console.error('YouTube OAuth error:', error)
     return NextResponse.redirect(
       new URL(
-        `/youtube-connect?error=${'${encodeURIComponent('}
+        `/youtube-connect?error=${encodeURIComponent(
           error === 'access_denied'
             ? 'You denied access to your YouTube channel'
             : 'OAuth authorization failed'
-        ${')'}`,
+        )}`,
         request.url
       )
     )
@@ -37,9 +38,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Verify user is authenticated
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
       return NextResponse.redirect(new URL('/login', request.url))
@@ -90,58 +89,63 @@ export async function GET(request: NextRequest) {
         refresh_token: tokens.refresh_token,
         token_expires_at: new Date(tokens.expiry_date || Date.now() + 3600000).toISOString(),
         connected_at: new Date().toISOString(),
-      })
+      } as any)
 
     if (insertError) throw insertError
 
     // Clean up state record
-    await supabase.from('oauth_states').delete().eq('id', stateRecord.id)
+    await supabase.from('oauth_states').delete().eq('id', (stateRecord as any).id)
 
     // CRITICAL: Automatically queue free page generation
     console.log('[YouTube OAuth] Connection successful, triggering queue generation')
 
     try {
-      const queueResponse = await fetch(
-        `${'${process.env.NEXT_PUBLIC_SITE_URL}'}/api/generation/queue`,
-        {
-          method: 'POST',
-          headers: {
-            Cookie: request.headers.get('cookie') || '',
-          },
-        }
+      // First, get the most popular video to queue for generation
+      const mostPopularVideo = await getMostPopularVideo(
+        tokens.access_token,
+        tokens.refresh_token,
+        channelInfo.channelId
       )
 
-      if (queueResponse.ok) {
-        const queueData = await queueResponse.json()
-        console.log('[YouTube OAuth] Queue generation triggered:', {
-          queueItemId: queueData.queueItem?.id,
-          videoTitle: queueData.queueItem?.video_title,
-        })
+      // Create queue entry
+      const { data: queueItem, error: queueError } = await supabase
+        .from('generation_queue')
+        .insert({
+          user_id: user.id,
+          video_id: mostPopularVideo.videoId,
+          video_title: mostPopularVideo.title,
+          video_url: mostPopularVideo.url,
+          status: 'pending',
+        } as any)
+        .select()
+        .single()
 
-        // Redirect to generating page
-        return NextResponse.redirect(
-          new URL('/generating', request.url)
-        )
-      } else {
-        const errorData = await queueResponse.json()
-        console.error('[YouTube OAuth] Failed to queue generation:', errorData.error)
-      }
-    } catch (error) {
-      console.error('[YouTube OAuth] CRITICAL: Failed to auto-queue generation:', error)
+      if (queueError) throw queueError
+
+      console.log('[YouTube OAuth] Queue generation triggered:', {
+        queueItemId: (queueItem as any)?.id,
+        videoTitle: (queueItem as any)?.video_title,
+      })
+
+      // Redirect to generating page
+      return NextResponse.redirect(
+        new URL('/generating', request.url)
+      )
+    } catch (queueError) {
+      console.error('[YouTube OAuth] CRITICAL: Failed to auto-queue generation:', queueError)
+      // Fallback: redirect to dashboard
+      console.log('[YouTube OAuth] Falling back to dashboard redirect')
+      return NextResponse.redirect(
+        new URL('/dashboard?youtube_connected=true', request.url)
+      )
     }
-
-    // Fallback: redirect to dashboard
-    console.log('[YouTube OAuth] Falling back to dashboard redirect')
-    return NextResponse.redirect(
-      new URL('/dashboard?youtube_connected=true', request.url)
-    )
   } catch (error: any) {
     console.error('YouTube OAuth callback error:', error)
     return NextResponse.redirect(
       new URL(
-        `/youtube-connect?error=${'${encodeURIComponent('}
+        `/youtube-connect?error=${encodeURIComponent(
           error.message || 'Failed to connect YouTube channel'
-        ${')'}`,
+        )}`,
         request.url
       )
     )

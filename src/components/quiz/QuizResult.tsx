@@ -68,9 +68,39 @@ export function QuizResult({ state }: QuizResultProps) {
           <p className="text-txt-mid">{interpretation.description}</p>
         </div>
 
+        {/* ONBOARD-09: Template Selection CTA */}
+        <div className="bg-surface border border-border rounded-lg p-6 mb-8">
+          <h3 className="text-lg font-semibold mb-3">
+            Choose Your Template Style
+          </h3>
+          <p className="text-txt-mid text-sm mb-4">
+            Your free page will use our default Minimal template. After generation, you can preview other styles and upgrade to unlock all templates.
+          </p>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-card border border-border rounded-lg p-3 text-center">
+              <div className="text-2xl mb-1">📄</div>
+              <div className="text-xs font-medium">Minimal</div>
+              <div className="text-xs text-accent mt-1">Default</div>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-3 text-center opacity-50">
+              <div className="text-2xl mb-1">📰</div>
+              <div className="text-xs font-medium">Editorial</div>
+              <div className="text-xs text-txt-faint mt-1">Pro+</div>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-3 text-center opacity-50">
+              <div className="text-2xl mb-1">🔧</div>
+              <div className="text-xs font-medium">Technical</div>
+              <div className="text-xs text-txt-faint mt-1">Pro+</div>
+            </div>
+          </div>
+          <p className="text-txt-faint text-xs mt-4 text-center">
+            Upgrade to Pro or Authority tier to unlock all templates + customization
+          </p>
+        </div>
+
         {/* CTA */}
         <Link
-          href="/signup"
+          href="/signup?quiz_completed=true"
           className="inline-block bg-accent text-bg font-medium px-8 py-4 rounded-lg hover:bg-accent/90 transition-smooth"
         >
           Create Account to Get Your Free Page

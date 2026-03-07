@@ -7,9 +7,7 @@ export async function GET() {
   const supabase = await createClient()
 
   // Verify user is authenticated
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -26,7 +24,7 @@ export async function GET() {
       user_id: user.id,
       state,
       expires_at: expiresAt.toISOString(),
-    })
+    } as any)
 
     if (stateError) throw stateError
 

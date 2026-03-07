@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { LogoutButton } from '@/components/auth/LogoutButton'
+import { GenerationQueueStatus } from '@/components/dashboard/GenerationQueueStatus'
 import Link from 'next/link'
 
 export default async function DashboardPage() {
@@ -18,7 +19,7 @@ export default async function DashboardPage() {
     .from('youtube_connections')
     .select('*')
     .eq('user_id', user.id)
-    .single()
+    .single() as any
 
   return (
     <div className="min-h-screen bg-bg p-8">
@@ -37,15 +38,15 @@ export default async function DashboardPage() {
                   YouTube Connected ✓
                 </h2>
                 <p className="text-txt-mid">
-                  Channel: {youtubeConnection.channel_name}
+                  Channel: {(youtubeConnection as any).channel_name}
                 </p>
                 <p className="text-txt-faint text-sm">
-                  {youtubeConnection.channel_subscriber_count?.toLocaleString()}{' '}
+                  {(youtubeConnection as any).channel_subscriber_count?.toLocaleString()}{' '}
                   subscribers
                 </p>
               </div>
               <a
-                href={youtubeConnection.channel_url}
+                href={(youtubeConnection as any).channel_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent hover:underline"
@@ -70,6 +71,9 @@ export default async function DashboardPage() {
             </Link>
           </div>
         )}
+
+        {/* Generation Queue Status */}
+        <GenerationQueueStatus />
 
         <div className="bg-card border border-border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Account Info</h2>
