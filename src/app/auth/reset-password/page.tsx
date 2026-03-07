@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -11,8 +11,14 @@ export default function UpdatePasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const supabase = mounted ? createClient() : null
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -21,6 +27,12 @@ export default function UpdatePasswordPage() {
 
     if (password !== confirmPassword) {
       setError('Passwords do not match')
+      setLoading(false)
+      return
+    }
+
+    if (!supabase) {
+      setError('Supabase client not initialized')
       setLoading(false)
       return
     }
