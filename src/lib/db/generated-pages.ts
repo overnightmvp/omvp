@@ -148,6 +148,43 @@ export async function getPage(
 }
 
 /**
+ * Retrieves a published page by creator handle and slug.
+ * Only returns pages that have been published (published_at is not null).
+ *
+ * @param creatorHandle - Creator's handle from subdomain
+ * @param slug - URL-friendly page slug
+ * @returns Page record or null if not found/not published
+ */
+export async function getPublishedPageByHandle(
+  creatorHandle: string,
+  slug: string
+): Promise<GeneratedPage | null> {
+  const supabase = getSupabaseClient()
+
+  // Query profiles to get user_id from handle, then join with generated_pages
+  const { data, error } = await supabase
+    .from('generated_pages')
+    .select(`
+      *,
+      profiles!inner(handle)
+    `)
+    .eq('profiles.handle', creatorHandle)
+    .eq('slug', slug)
+    .not('published_at', 'is', null)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // Not found
+      return null
+    }
+    throw new Error(`Failed to get published page: ${error.message}`)
+  }
+
+  return data as GeneratedPage
+}
+
+/**
  * Updates the schema markup for an existing page.
  *
  * @param pageId - Page ID to update
@@ -168,4 +205,32 @@ export async function updatePageSchema(
   if (error) {
     throw new Error(`Failed to update page schema: ${error.message}`)
   }
+}
+
+/**
+ * Retrieves a generated page by queue item ID.
+ *
+ * @param queueItemId - Queue item ID
+ * @returns Page record or null if not found
+ */
+export async function getPageByQueueItemId(
+  queueItemId: string
+): Promise<GeneratedPage | null> {
+  const supabase = getSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('generated_pages')
+    .select('*')
+    .eq('queue_item_id', queueItemId)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // Not found
+      return null
+    }
+    throw new Error(`Failed to get page: ${error.message}`)
+  }
+
+  return data as GeneratedPage
 }
