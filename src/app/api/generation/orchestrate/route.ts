@@ -162,24 +162,46 @@ async function handler(request: NextRequest) {
 
       console.log(`[Orchestrate] Page ${page.id} published successfully`)
 
-      // TODO: Trigger Plan 02-06's indexing and notification handler
-      // For now, log a placeholder
-      console.log(`[Orchestrate] TODO: Trigger indexing and send email notification for page ${page.id}`)
+      // Step 5: Submit for indexing (Plan 02-06)
+      console.log(`[Orchestrate] Submitting page for indexing`)
+      try {
+        const indexResponse = await fetch(`${baseUrl}/api/generation/index`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ queueItemId }),
+        })
 
-      // Note: Plan 02-06 will implement:
-      // - Search indexing (Algolia/Meilisearch)
-      // - Email notification to user
-      // await fetch(`${baseUrl}/api/generation/notify`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     queueItemId,
-      //     status: 'success',
-      //     page_id: page.id,
-      //     user_id: queueItem.user_id,
-      //     published_at: new Date().toISOString()
-      //   }),
-      // })
+        if (!indexResponse.ok) {
+          console.warn(`[Orchestrate] Indexing failed (non-blocking):`, await indexResponse.text())
+        } else {
+          console.log(`[Orchestrate] Indexing submission complete`)
+        }
+      } catch (indexError: any) {
+        // Don't fail pipeline if indexing fails (best-effort)
+        console.warn(`[Orchestrate] Indexing error (non-blocking):`, indexError.message)
+      }
+
+      // Step 6: Send success notification email (Plan 02-06)
+      console.log(`[Orchestrate] Sending success notification email`)
+      try {
+        const notifyResponse = await fetch(`${baseUrl}/api/generation/notify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            queueItemId,
+            status: 'success',
+          }),
+        })
+
+        if (!notifyResponse.ok) {
+          console.warn(`[Orchestrate] Notification failed (non-blocking):`, await notifyResponse.text())
+        } else {
+          console.log(`[Orchestrate] Notification email sent successfully`)
+        }
+      } catch (notifyError: any) {
+        // Don't fail pipeline if email fails (best-effort)
+        console.warn(`[Orchestrate] Notification error (non-blocking):`, notifyError.message)
+      }
 
       currentStatus = 'published'
     }
@@ -207,6 +229,24 @@ async function handler(request: NextRequest) {
 
     // Update queue with error
     await updateQueueStatus(queueItemId, 'failed', error.message)
+
+    // Send failure notification if max retries exceeded (Plan 02-06)
+    if (retryCount >= 3) {
+      console.log(`[Orchestrate] Max retries exceeded, sending failure notification`)
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'
+        await fetch(`${baseUrl}/api/generation/notify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            queueItemId,
+            status: 'failed',
+          }),
+        })
+      } catch (notifyError: any) {
+        console.warn(`[Orchestrate] Failed to send failure notification:`, notifyError.message)
+      }
+    }
 
     // Retry logic with exponential backoff (max 3 retries)
     if (retryCount < 3) {
