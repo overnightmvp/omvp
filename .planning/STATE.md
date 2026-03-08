@@ -2,56 +2,55 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 02-03
+current_plan: 02-05
 status: executing
-last_updated: "2026-03-08T08:03:00.000Z"
+last_updated: "2026-03-08T08:14:00.000Z"
 progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 7
-  completed_plans: 13
+  completed_plans: 5
 ---
 
 # Project State
 
 **Phase:** 02-automation-pipeline
-**Current Plan:** 02-03
+**Current Plan:** 02-05
 **Status:** In Progress
 
 ## Progress
 
 - ✅ Phase 01-onboarding-foundation: 7/7 plans complete (100%)
-- 🚧 Phase 02-automation-pipeline: 3/7 plans complete (43%)
+- 🚧 Phase 02-automation-pipeline: 5/7 plans complete (71%)
   - ✅ 02-01-PLAN.md: Apify Integration & YouTube Scraping (COMPLETE)
   - ✅ 02-02-PLAN.md: Transcript Cleaning & Content Transformation (COMPLETE)
   - ✅ 02-03-PLAN.md: Schema Builder & Page Storage (COMPLETE)
-  - ⏳ 02-04-PLAN.md: Publisher & Subdomain Routing (NEXT)
-  - ⏳ 02-05-PLAN.md: Queue Orchestrator & Cron Job
-  - ⏳ 02-06-PLAN.md: Indexing & Email Notifications
+  - ✅ 02-04-PLAN.md: Publisher & Subdomain Routing (COMPLETE)
+  - ✅ 02-05-PLAN.md: Queue Orchestrator & Cron Job (COMPLETE)
+  - ⏳ 02-06-PLAN.md: Indexing & Email Notifications (NEXT)
 
 ## Latest Session
 
-**Last Executed:** 02-03-PLAN.md
-**Completed:** 2026-03-08T08:03:00Z
-**Duration:** 8 minutes
+**Last Executed:** 02-05-PLAN.md
+**Completed:** 2026-03-08T08:14:00Z
+**Duration:** 9 minutes
 
-### Key Accomplishments (02-03)
+### Key Accomplishments (02-05)
 
-- Implemented JSON-LD schema builder with TDD approach (8 tests, 100% pass rate)
-- Generated schema.org compliant schemas: Article, Person, Organization, FAQPage
-- Created generated_pages table with RLS policies for user data isolation
-- Built database utilities with slug generation and conflict resolution (max 5 retries)
-- Created /api/generation/schema endpoint with comprehensive validation
-- Integrated user profile data for Person schema (YouTube connection, quiz responses)
-- All schemas validate with @context and @type checks before storage
-- Added 'schema_generated' status to queue pipeline
-- All requirements (AUTO-07) met
+- Built QStash-powered pipeline orchestration with TDD approach (11 tests, 100% pass rate)
+- Implemented Vercel Cron Job polling queue every 5 minutes
+- Created sequential pipeline execution (scrape → transform → schema → publish)
+- Implemented retry logic with exponential backoff (2^n * 60000ms, max 3 retries)
+- Integrated QStash signature verification for security
+- Created orchestration endpoint that chains all pipeline steps
+- Configured vercel.json for automated cron scheduling
+- Added getPageByQueueItemId helper for publishing flow
+- All requirements (AUTO-03, AUTO-08, AUTO-10, AUTO-12, ONBOARD-07) met
 
 ### Deviations Handled
 
-**02-03 Auto-fixed Issues:**
-1. **[Rule 3 - Blocking]** Added migration for schema_generated status (not in original constraint)
-2. **[Rule 3 - Blocking]** Moved migration to proper supabase/migrations/ directory with timestamp naming
+**02-05 Auto-fixed Issues:**
+None - Plan executed exactly as written.
 
 ## Decisions Made
 
@@ -68,6 +67,8 @@ progress:
 8. **Prompt caching:** 90% cost reduction on Claude API system prompts
 9. **Apify SDK over YouTube Data API:** Avoids quota limits, handles anti-bot detection automatically
 10. **Store scraped_data in JSONB column:** Flexible schema for varying Apify response structures
+11. **QStash over AWS SQS:** Native Vercel integration, simpler setup, built-in retry logic, free tier sufficient
+12. **Exponential backoff (2^n * 60000ms):** Balances reliability with avoiding infinite loops, 8-minute max delay acceptable
 - [Phase 02-automation-pipeline]: Centralized mock setup over per-file inline mocks for test maintainability
 - [Phase 02-automation-pipeline]: Module-level vi.mock() for automatic external service interception
 - [Phase 02]: Used schema.org JSON-LD spec for all 4 schema types with validation
@@ -85,10 +86,14 @@ progress:
 **Phase 02:**
 - ✅ AUTO-01: System can fetch YouTube channel metadata via Apify
 - ✅ AUTO-02: System can extract video transcripts for any YouTube video
+- ✅ AUTO-03: System orchestrates 6-agent pipeline automatically
 - ✅ AUTO-04: Transcript cleaning removes filler words and timestamps
 - ✅ AUTO-05: Claude Sonnet generates 1500-2500 word SEO articles
 - ✅ AUTO-06: Articles include headline, meta description, H2 sections, FAQ
 - ✅ AUTO-07: System generates valid JSON-LD schema markup (Article, Person, Organization, FAQ)
+- ✅ AUTO-08: Failed generations retry with exponential backoff
+- ✅ AUTO-10: Queue processes items based on priority and timestamp
+- ✅ AUTO-12: Status tracking throughout pipeline (pending → published)
 
 ## Commits Made
 
@@ -109,23 +114,28 @@ progress:
 - `3899c04`: feat(02-03): implement JSON-LD schema builder with TDD
 - `ed625c3`: feat(02-03): create generated_pages migration and database utilities
 - `17ccf5f`: feat(02-03): create schema generation API endpoint with page storage
+- `76d89c8`: test(02-05): add failing tests for queue orchestrator (TDD RED+GREEN)
+- `1155c89`: feat(02-05): create Vercel Cron Job for queue processing
+- `c7854cd`: feat(02-05): create orchestration endpoint with QStash integration
 
 ## Phase Status
 
 **Phase 01:** ✅ COMPLETE (7/7 plans)
-**Phase 02:** 🚧 IN PROGRESS (3/7 plans complete)
+**Phase 02:** 🚧 IN PROGRESS (5/7 plans complete - 71%)
 
 ## Next Steps
 
-Ready to proceed to 02-04-PLAN.md: Publisher & Subdomain Routing
+Ready to proceed to 02-06-PLAN.md: Indexing & Email Notifications
 - ✅ Apify scraping implemented
 - ✅ Transcript cleaning implemented
 - ✅ Claude API integrated
 - ✅ Transform endpoint ready
 - ✅ Schema generation and page storage complete
-- Next: Build page publisher and subdomain routing system
+- ✅ Publisher and subdomain routing ready (02-04)
+- ✅ Queue orchestrator and Vercel Cron configured (02-05)
+- Next: Build indexing handler and email notification system
 
 ---
 
-*Last updated: 2026-03-08T08:03:00Z*
+*Last updated: 2026-03-08T08:14:00Z*
 *Executor: GSD Executor (claude-sonnet-4-5)*

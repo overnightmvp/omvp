@@ -73,8 +73,8 @@ Plans:
 - [x] 02-01-PLAN.md — Apify Integration & YouTube Scraping (Wave 1)
 - [x] 02-02-PLAN.md — Transcript Cleaning & Content Transformation (Wave 1)
 - [x] 02-03-PLAN.md — Schema Builder & Page Storage (Wave 2)
-- [ ] 02-04-PLAN.md — Publisher & Subdomain Routing (Wave 2)
-- [ ] 02-05-PLAN.md — Queue Orchestrator & Cron Job (Wave 3)
+- [x] 02-04-PLAN.md — Publisher & Subdomain Routing (Wave 2)
+- [x] 02-05-PLAN.md — Queue Orchestrator & Cron Job (Wave 3)
 - [ ] 02-06-PLAN.md — Indexing & Email Notifications (Wave 3)
 
 ### Scope
