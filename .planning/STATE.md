@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_plan: 02-02
-status: in-progress
-last_updated: "2026-03-08T07:40:00Z"
+status: executing
+last_updated: "2026-03-08T07:46:41.677Z"
 progress:
   total_phases: 2
-  completed_phases: 1
-  total_plans: 14
-  completed_plans: 9
+  completed_phases: 0
+  total_plans: 7
+  completed_plans: 11
 ---
 
 # Project State
@@ -71,6 +71,8 @@ Apify API key required for YouTube scraping (documented in .env.local.example)
 8. **Prompt caching:** 90% cost reduction on Claude API system prompts
 9. **Apify SDK over YouTube Data API:** Avoids quota limits, handles anti-bot detection automatically
 10. **Store scraped_data in JSONB column:** Flexible schema for varying Apify response structures
+- [Phase 02-automation-pipeline]: Centralized mock setup over per-file inline mocks for test maintainability
+- [Phase 02-automation-pipeline]: Module-level vi.mock() for automatic external service interception
 
 ## Requirements Status
 
