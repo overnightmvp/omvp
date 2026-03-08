@@ -15,8 +15,8 @@ Requirements for beta launch (March 2026). Each maps to roadmap phases.
 - [ ] **ONBOARD-04**: Quiz calculates authority score (0-100) using validated algorithm
 - [ ] **ONBOARD-05**: Quiz result page displays score + interpretation
 - [ ] **ONBOARD-06**: User can connect YouTube channel via OAuth after quiz completion
-- [ ] **ONBOARD-07**: System generates 1 free SEO page from user's most popular YouTube video
-- [ ] **ONBOARD-08**: User receives email notification when free page is ready (<15 min)
+- [x] **ONBOARD-07**: System generates 1 free SEO page from user's most popular YouTube video
+- [x] **ONBOARD-08**: User receives email notification when free page is ready (<15 min)
 - [ ] **ONBOARD-09**: Free page preview includes CTA to choose template + upgrade to paid tier
 
 ### Authentication (AUTH)
@@ -32,16 +32,16 @@ Requirements for beta launch (March 2026). Each maps to roadmap phases.
 
 - [x] **AUTO-01**: System scrapes YouTube channel data via Apify actor (channel metadata, video list) 
 - [x] **AUTO-02**: System extracts transcripts for selected videos via Apify
-- [ ] **AUTO-03**: n8n workflow orchestrates scrape → clean → transform → publish pipeline {i want to use openclaw or cron jobs the simpler the better}
-- [ ] **AUTO-04**: Transcript cleaning agent removes filler words, timestamps, repeated phrases
-- [ ] **AUTO-05**: Content transformation agent (Claude Sonnet) converts transcript to SEO article (1500-2500 words)
-- [ ] **AUTO-06**: Article includes: headline, meta description, structured sections, keyword optimization, FAQ
+- [x] **AUTO-03**: n8n workflow orchestrates scrape → clean → transform → publish pipeline {i want to use openclaw or cron jobs the simpler the better}
+- [x] **AUTO-04**: Transcript cleaning agent removes filler words, timestamps, repeated phrases
+- [x] **AUTO-05**: Content transformation agent (Claude Sonnet) converts transcript to SEO article (1500-2500 words)
+- [x] **AUTO-06**: Article includes: headline, meta description, structured sections, keyword optimization, FAQ
 - [x] **AUTO-07**: Schema builder generates JSON-LD markup (Article, Person, Organization schemas, FAQ schema, entity)
-- [ ] **AUTO-08**: Publisher agent deploys page to creator's subdomain (creator.platform.com)
-- [ ] **AUTO-09**: Indexing monitor submits URL to Google Search Console
-- [ ] **AUTO-10**: User can view generation queue status in dashboard (pending/processing/published)
-- [ ] **AUTO-11**: System sends email notification when page is published
-- [ ] **AUTO-12**: Failed generations are logged with error details and retry option
+- [x] **AUTO-08**: Publisher agent deploys page to creator's subdomain (creator.platform.com)
+- [x] **AUTO-09**: Indexing monitor submits URL to Google Search Console
+- [x] **AUTO-10**: User can view generation queue status in dashboard (pending/processing/published)
+- [x] **AUTO-11**: System sends email notification when page is published
+- [x] **AUTO-12**: Failed generations are logged with error details and retry option
 
 ### Templates (TMPL)
 
