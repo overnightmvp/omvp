@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 current_plan: 02-05
 status: executing
-last_updated: "2026-03-08T08:14:00.000Z"
+last_updated: "2026-03-08T12:23:37.779Z"
 progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 14
 ---
 
 # Project State
@@ -73,6 +73,8 @@ None - Plan executed exactly as written.
 - [Phase 02-automation-pipeline]: Module-level vi.mock() for automatic external service interception
 - [Phase 02]: Used schema.org JSON-LD spec for all 4 schema types with validation
 - [Phase 02]: Implemented slug conflict resolution with random suffix retry (max 5 attempts)
+- [Phase 02-04]: Next.js middleware for subdomain routing - native feature, zero-config on Vercel
+- [Phase 02-04]: react-markdown over dangerouslySetInnerHTML for XSS protection
 
 ## Requirements Status
 
