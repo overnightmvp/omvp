@@ -30,8 +30,8 @@ Requirements for beta launch (March 2026). Each maps to roadmap phases.
 
 ### Automation Pipeline (AUTO)
 
-- [ ] **AUTO-01**: System scrapes YouTube channel data via Apify actor (channel metadata, video list) 
-- [ ] **AUTO-02**: System extracts transcripts for selected videos via Apify
+- [x] **AUTO-01**: System scrapes YouTube channel data via Apify actor (channel metadata, video list) 
+- [x] **AUTO-02**: System extracts transcripts for selected videos via Apify
 - [ ] **AUTO-03**: n8n workflow orchestrates scrape → clean → transform → publish pipeline {i want to use openclaw or cron jobs the simpler the better}
 - [ ] **AUTO-04**: Transcript cleaning agent removes filler words, timestamps, repeated phrases
 - [ ] **AUTO-05**: Content transformation agent (Claude Sonnet) converts transcript to SEO article (1500-2500 words)
