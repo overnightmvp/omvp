@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       .in('status', ['pending', 'scraped', 'transformed', 'schema_generated'])
       .order('priority', { ascending: false })
       .order('queued_at', { ascending: true })
-      .limit(5)
+      .limit(5) as { data: Array<{ id: string; status: string }> | null; error: any }
 
     if (error) {
       console.error('[Cron] Error fetching queue items:', error)
