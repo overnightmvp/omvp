@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { extractSubdomain, isValidSubdomain } from './src/lib/subdomain'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -11,6 +12,22 @@ export async function middleware(request: NextRequest) {
     pathname.match(/\.(jpg|jpeg|png|gif|ico|svg|webp)$/)
   ) {
     return NextResponse.next()
+  }
+
+  // =====================================================
+  // SUBDOMAIN ROUTING (runs BEFORE Supabase auth logic)
+  // =====================================================
+  // Handle subdomain-based routing for creator pages
+  // Only active when NEXT_PUBLIC_ROOT_DOMAIN is set
+  const hostname = request.headers.get('host') || ''
+  const subdomain = extractSubdomain(hostname)
+
+  if (subdomain && isValidSubdomain(subdomain)) {
+    // Rewrite subdomain requests to /pages/[creator]/[slug]
+    // Example: creator.platform.com/article -> /pages/creator/article
+    const url = request.nextUrl.clone()
+    url.pathname = `/pages/${subdomain}${pathname}`
+    return NextResponse.rewrite(url)
   }
 
   let response = NextResponse.next({
