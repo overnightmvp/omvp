@@ -36,7 +36,7 @@ Requirements for beta launch (March 2026). Each maps to roadmap phases.
 - [ ] **AUTO-04**: Transcript cleaning agent removes filler words, timestamps, repeated phrases
 - [ ] **AUTO-05**: Content transformation agent (Claude Sonnet) converts transcript to SEO article (1500-2500 words)
 - [ ] **AUTO-06**: Article includes: headline, meta description, structured sections, keyword optimization, FAQ
-- [ ] **AUTO-07**: Schema builder generates JSON-LD markup (Article, Person, Organization schemas, FAQ schema, entity)
+- [x] **AUTO-07**: Schema builder generates JSON-LD markup (Article, Person, Organization schemas, FAQ schema, entity)
 - [ ] **AUTO-08**: Publisher agent deploys page to creator's subdomain (creator.platform.com)
 - [ ] **AUTO-09**: Indexing monitor submits URL to Google Search Console
 - [ ] **AUTO-10**: User can view generation queue status in dashboard (pending/processing/published)

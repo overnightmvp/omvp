@@ -2,59 +2,56 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 02-02
+current_plan: 02-03
 status: executing
-last_updated: "2026-03-08T07:46:41.677Z"
+last_updated: "2026-03-08T08:03:00.000Z"
 progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 7
-  completed_plans: 11
+  completed_plans: 13
 ---
 
 # Project State
 
 **Phase:** 02-automation-pipeline
-**Current Plan:** 02-02
+**Current Plan:** 02-03
 **Status:** In Progress
 
 ## Progress
 
 - ✅ Phase 01-onboarding-foundation: 7/7 plans complete (100%)
-- 🚧 Phase 02-automation-pipeline: 2/7 plans complete (29%)
+- 🚧 Phase 02-automation-pipeline: 3/7 plans complete (43%)
   - ✅ 02-01-PLAN.md: Apify Integration & YouTube Scraping (COMPLETE)
   - ✅ 02-02-PLAN.md: Transcript Cleaning & Content Transformation (COMPLETE)
-  - ⏳ 02-03-PLAN.md: Schema Builder & Page Storage (NEXT)
-  - ⏳ 02-04-PLAN.md: Publisher & Subdomain Routing
+  - ✅ 02-03-PLAN.md: Schema Builder & Page Storage (COMPLETE)
+  - ⏳ 02-04-PLAN.md: Publisher & Subdomain Routing (NEXT)
   - ⏳ 02-05-PLAN.md: Queue Orchestrator & Cron Job
   - ⏳ 02-06-PLAN.md: Indexing & Email Notifications
 
 ## Latest Session
 
-**Last Executed:** 02-01-PLAN.md
-**Completed:** 2026-03-08T07:40:00Z
-**Duration:** 6 minutes
+**Last Executed:** 02-03-PLAN.md
+**Completed:** 2026-03-08T08:03:00Z
+**Duration:** 8 minutes
 
-### Key Accomplishments (02-01)
+### Key Accomplishments (02-03)
 
-- Integrated Apify SDK for YouTube video scraping (apify-client@4.2.10)
-- Implemented scrapeYouTubeVideo() with TDD approach (6 tests, 100% pass rate)
-- Created /api/generation/scrape endpoint with comprehensive error handling
-- Added database migration for scraped_data and article_data JSONB columns
-- Extracted video metadata (title, description, viewCount, channelName, publishedDate)
-- Handled transcript extraction with graceful fallback for videos without captions
-- All requirements (AUTO-01, AUTO-02) met
-- TypeScript compilation clean, no errors
+- Implemented JSON-LD schema builder with TDD approach (8 tests, 100% pass rate)
+- Generated schema.org compliant schemas: Article, Person, Organization, FAQPage
+- Created generated_pages table with RLS policies for user data isolation
+- Built database utilities with slug generation and conflict resolution (max 5 retries)
+- Created /api/generation/schema endpoint with comprehensive validation
+- Integrated user profile data for Person schema (YouTube connection, quiz responses)
+- All schemas validate with @context and @type checks before storage
+- Added 'schema_generated' status to queue pipeline
+- All requirements (AUTO-07) met
 
 ### Deviations Handled
 
-**02-01 Auto-fixed Issues:**
-1. **[Rule 3 - Blocking]** Added database migration for scraped_data column (was referenced in 02-02 transform route but never migrated)
-2. **[TDD REFACTOR]** Fixed TypeScript type issues in mock structure (proper class constructor pattern)
-
-### Authentication Gates
-
-Apify API key required for YouTube scraping (documented in .env.local.example)
+**02-03 Auto-fixed Issues:**
+1. **[Rule 3 - Blocking]** Added migration for schema_generated status (not in original constraint)
+2. **[Rule 3 - Blocking]** Moved migration to proper supabase/migrations/ directory with timestamp naming
 
 ## Decisions Made
 
@@ -73,6 +70,8 @@ Apify API key required for YouTube scraping (documented in .env.local.example)
 10. **Store scraped_data in JSONB column:** Flexible schema for varying Apify response structures
 - [Phase 02-automation-pipeline]: Centralized mock setup over per-file inline mocks for test maintainability
 - [Phase 02-automation-pipeline]: Module-level vi.mock() for automatic external service interception
+- [Phase 02]: Used schema.org JSON-LD spec for all 4 schema types with validation
+- [Phase 02]: Implemented slug conflict resolution with random suffix retry (max 5 attempts)
 
 ## Requirements Status
 
@@ -89,6 +88,7 @@ Apify API key required for YouTube scraping (documented in .env.local.example)
 - ✅ AUTO-04: Transcript cleaning removes filler words and timestamps
 - ✅ AUTO-05: Claude Sonnet generates 1500-2500 word SEO articles
 - ✅ AUTO-06: Articles include headline, meta description, H2 sections, FAQ
+- ✅ AUTO-07: System generates valid JSON-LD schema markup (Article, Person, Organization, FAQ)
 
 ## Commits Made
 
@@ -106,22 +106,26 @@ Apify API key required for YouTube scraping (documented in .env.local.example)
 - `12a6d3c`: feat(02-02): implement transcript cleaning utility (TDD)
 - `5fea407`: feat(02-02): integrate Claude API for SEO content generation (TDD)
 - `887464c`: feat(02-02): create transform API route with queue integration
+- `3899c04`: feat(02-03): implement JSON-LD schema builder with TDD
+- `ed625c3`: feat(02-03): create generated_pages migration and database utilities
+- `17ccf5f`: feat(02-03): create schema generation API endpoint with page storage
 
 ## Phase Status
 
 **Phase 01:** ✅ COMPLETE (7/7 plans)
-**Phase 02:** 🚧 IN PROGRESS (2/7 plans complete)
+**Phase 02:** 🚧 IN PROGRESS (3/7 plans complete)
 
 ## Next Steps
 
-Ready to proceed to 02-03-PLAN.md: Schema Builder & Page Storage
+Ready to proceed to 02-04-PLAN.md: Publisher & Subdomain Routing
 - ✅ Apify scraping implemented
 - ✅ Transcript cleaning implemented
 - ✅ Claude API integrated
 - ✅ Transform endpoint ready
-- Next: Build JSON-LD schema markup and page storage
+- ✅ Schema generation and page storage complete
+- Next: Build page publisher and subdomain routing system
 
 ---
 
-*Last updated: 2026-03-08T07:40:00Z*
+*Last updated: 2026-03-08T08:03:00Z*
 *Executor: GSD Executor (claude-sonnet-4-5)*
