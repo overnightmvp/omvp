@@ -16,6 +16,7 @@ export interface GeneratedPage {
   faqs: Array<{ question: string; answer: string }> | null
   schema_markup: SchemaMarkup
   published_at: string | null
+  indexed_at: string | null
   created_at: string
   updated_at: string
 }
