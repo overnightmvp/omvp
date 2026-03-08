@@ -6,16 +6,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { scrapeYouTubeVideo } from '../../../src/lib/agents/scraper';
 import type { ScrapedVideoData } from '../../../src/lib/agents/types';
 
+// Create mocks outside of vi.mock for proper typing
+const mockDataset = {
+  listItems: vi.fn(),
+};
+
+const mockActor = {
+  call: vi.fn(),
+};
+
 // Mock the Apify client
 vi.mock('apify-client', () => {
-  const mockDataset = {
-    listItems: vi.fn(),
-  };
-
-  const mockActor = {
-    call: vi.fn(),
-  };
-
   class MockApifyClient {
     constructor() {}
     actor() {
@@ -28,8 +29,6 @@ vi.mock('apify-client', () => {
 
   return {
     ApifyClient: MockApifyClient,
-    _mockActor: mockActor,
-    _mockDataset: mockDataset,
   };
 });
 
@@ -56,9 +55,8 @@ describe('scrapeYouTubeVideo', () => {
     };
 
     // Mock Apify client behavior
-    const { ApifyClient, _mockActor, _mockDataset } = await import('apify-client');
-    _mockActor.call.mockResolvedValueOnce({ defaultDatasetId: 'test-dataset-id' });
-    _mockDataset.listItems.mockResolvedValueOnce(mockApifyResponse);
+    mockActor.call.mockResolvedValueOnce({ defaultDatasetId: 'test-dataset-id' });
+    mockDataset.listItems.mockResolvedValueOnce(mockApifyResponse);
 
     // Act
     const result = await scrapeYouTubeVideo(videoUrl);
@@ -89,9 +87,8 @@ describe('scrapeYouTubeVideo', () => {
       ],
     };
 
-    const { _mockActor, _mockDataset } = await import('apify-client');
-    _mockActor.call.mockResolvedValueOnce({ defaultDatasetId: 'test-dataset-id' });
-    _mockDataset.listItems.mockResolvedValueOnce(mockApifyResponse);
+    mockActor.call.mockResolvedValueOnce({ defaultDatasetId: 'test-dataset-id' });
+    mockDataset.listItems.mockResolvedValueOnce(mockApifyResponse);
 
     // Act
     const result = await scrapeYouTubeVideo(videoUrl);
@@ -126,9 +123,8 @@ describe('scrapeYouTubeVideo', () => {
       ],
     };
 
-    const { _mockActor, _mockDataset } = await import('apify-client');
-    _mockActor.call.mockResolvedValueOnce({ defaultDatasetId: 'test-dataset-id' });
-    _mockDataset.listItems.mockResolvedValueOnce(mockApifyResponse);
+    mockActor.call.mockResolvedValueOnce({ defaultDatasetId: 'test-dataset-id' });
+    mockDataset.listItems.mockResolvedValueOnce(mockApifyResponse);
 
     // Act
     const result = await scrapeYouTubeVideo(videoUrl);
@@ -147,9 +143,8 @@ describe('scrapeYouTubeVideo', () => {
       items: [],
     };
 
-    const { _mockActor, _mockDataset } = await import('apify-client');
-    _mockActor.call.mockResolvedValueOnce({ defaultDatasetId: 'test-dataset-id' });
-    _mockDataset.listItems.mockResolvedValueOnce(mockApifyResponse);
+    mockActor.call.mockResolvedValueOnce({ defaultDatasetId: 'test-dataset-id' });
+    mockDataset.listItems.mockResolvedValueOnce(mockApifyResponse);
 
     // Act & Assert
     await expect(scrapeYouTubeVideo(videoUrl)).rejects.toThrow('No data returned from Apify');

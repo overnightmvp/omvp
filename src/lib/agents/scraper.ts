@@ -92,7 +92,7 @@ export async function scrapeYouTubeVideo(
     }
 
     // Extract the first video result
-    const videoData = items[0] as ApifyVideoResult;
+    const videoData = items[0] as unknown as ApifyVideoResult;
 
     // Map to our ScrapedVideoData interface
     const scrapedData: ScrapedVideoData = {
