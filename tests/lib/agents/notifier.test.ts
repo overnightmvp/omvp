@@ -7,7 +7,7 @@ vi.mock('resend', () => {
   return {
     Resend: class {
       constructor() {
-        this.emails = {
+        (this as any).emails = {
           send: mockSend,
         }
       }

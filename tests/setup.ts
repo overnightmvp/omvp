@@ -148,7 +148,7 @@ export const mockSupabaseClient = {
       error: null
     }),
   },
-}
+} as any
 
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => mockSupabaseClient),

@@ -66,9 +66,9 @@ export async function POST(request: Request) {
       .from('profiles')
       .select('handle')
       .eq('id', page.user_id)
-      .single()
+      .single() as any
 
-    if (!profile || !profile.handle) {
+    if (!profile || !(profile as any).handle) {
       return NextResponse.json(
         { success: false, error: 'Creator handle not found' },
         { status: 404 }
@@ -77,16 +77,17 @@ export async function POST(request: Request) {
 
     // Build page URL: https://{creator}.{ROOT_DOMAIN}/{slug}
     const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3001'
-    const pageUrl = `https://${profile.handle}.${rootDomain}/${page.slug}`
+    const pageUrl = `https://${(profile as any).handle}.${rootDomain}/${page.slug}`
 
     // Submit for indexing (MVP: logs submission)
     const indexed = await requestIndexing(pageUrl)
 
     // Update generated_pages with indexed_at timestamp
     if (indexed) {
-      await supabase
+      const now = new Date().toISOString()
+      await (supabase as any)
         .from('generated_pages')
-        .update({ indexed_at: new Date().toISOString() } as any)
+        .update({ indexed_at: now })
         .eq('id', page.id)
     }
 

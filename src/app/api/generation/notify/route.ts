@@ -80,9 +80,9 @@ export async function POST(request: Request) {
         .from('profiles')
         .select('handle')
         .eq('id', page.user_id)
-        .single()
+        .single() as any
 
-      if (!profile || !profile.handle) {
+      if (!profile || !(profile as any).handle) {
         return NextResponse.json(
           { success: false, error: 'Creator handle not found' },
           { status: 404 }
@@ -91,7 +91,7 @@ export async function POST(request: Request) {
 
       // Build page URL
       const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3001'
-      const pageUrl = `https://${profile.handle}.${rootDomain}/${page.slug}`
+      const pageUrl = `https://${(profile as any).handle}.${rootDomain}/${page.slug}`
 
       // Send success email
       const result = await sendPageReadyEmail(userEmail, {

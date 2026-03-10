@@ -80,9 +80,9 @@ async function handler(request: NextRequest) {
         .from('generation_queue')
         .select('status')
         .eq('id', queueItemId)
-        .single()
+        .single() as any
 
-      currentStatus = updatedItem?.status || currentStatus
+      currentStatus = (updatedItem as any)?.status || currentStatus
       console.log(`[Orchestrate] Scrape complete. New status: ${currentStatus}`)
     }
 
@@ -105,9 +105,9 @@ async function handler(request: NextRequest) {
         .from('generation_queue')
         .select('status')
         .eq('id', queueItemId)
-        .single()
+        .single() as any
 
-      currentStatus = updatedItem?.status || currentStatus
+      currentStatus = (updatedItem as any)?.status || currentStatus
       console.log(`[Orchestrate] Transform complete. New status: ${currentStatus}`)
     }
 
@@ -130,9 +130,9 @@ async function handler(request: NextRequest) {
         .from('generation_queue')
         .select('status')
         .eq('id', queueItemId)
-        .single()
+        .single() as any
 
-      currentStatus = updatedItem?.status || currentStatus
+      currentStatus = (updatedItem as any)?.status || currentStatus
       console.log(`[Orchestrate] Schema generation complete. New status: ${currentStatus}`)
     }
 
@@ -148,7 +148,7 @@ async function handler(request: NextRequest) {
       }
 
       // Publish page by setting published_at timestamp
-      const { error: publishError } = await supabase
+      const { error: publishError } = await (supabase as any)
         .from('generated_pages')
         .update({ published_at: new Date().toISOString() })
         .eq('id', page.id)

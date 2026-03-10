@@ -62,10 +62,10 @@ describe('Mock Setup Verification', () => {
     expect(Array.isArray(claudeResult.content)).toBe(true)
 
     // Test Supabase mock
-    const supabaseResult = await mockSupabaseClient.from('test').select().single()
+    const supabaseResult = await (mockSupabaseClient.from('test').select().single() as any)
     expect(supabaseResult).toHaveProperty('data')
     expect(supabaseResult).toHaveProperty('error')
-    expect(supabaseResult.error).toBeNull()
+    expect((supabaseResult as any).error).toBeNull()
 
     // Test QStash mock
     const qstashResult = await mockQStashClient.publishJSON({
