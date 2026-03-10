@@ -1,8 +1,4 @@
 {
-  "crons": [
-    {
-      "path": "/api/cron/process-queue",
-      "schedule": "*/5 * * * *"
-    }
-  ]
+  "_comment": "Cron jobs disabled for initial deployment - see LAUNCH-CHECKLIST.md",
+  "crons": []
 }
